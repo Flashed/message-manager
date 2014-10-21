@@ -5,6 +5,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.Iterator;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author Mikhail Zaitsev
@@ -15,21 +17,24 @@ public class MessageManager {
 
   private int port;
 
-  private ServerSocketChannel serverChanel;
+  private int nThread;
 
   private Selector selector;
 
-  private ByteBuffer readBuffer = ByteBuffer.allocate(8192);
+  private ThreadPoolExecutor poolExecutor;
 
-  public MessageManager(int port) {
+  public MessageManager(int port, int nThread) {
     this.port = port;
+    this.nThread = nThread;
   }
 
   public void init() throws IOException {
 
+    poolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nThread);
+
     selector = SelectorProvider.provider().openSelector();
 
-    serverChanel = ServerSocketChannel.open();
+    ServerSocketChannel serverChanel = ServerSocketChannel.open();
     serverChanel.configureBlocking(false);
 
     InetSocketAddress isa = new InetSocketAddress(port);
@@ -65,6 +70,8 @@ public class MessageManager {
             accept(key);
           } else if (key.isReadable()) {
             read(key);
+          } else{
+            System.out.println("Other key type");
           }
         }
       } catch (Exception e) {
@@ -92,12 +99,13 @@ public class MessageManager {
     SocketChannel socketChannel = (SocketChannel) key.channel();
 
     // Clear out our read buffer so it's ready for new data
-    this.readBuffer.clear();
+    ByteBuffer readBuffer = ByteBuffer.allocate(1024);
+    readBuffer.clear();
 
     // Attempt to read off the channel
     int numRead;
     try {
-      numRead = socketChannel.read(this.readBuffer);
+      numRead = socketChannel.read(readBuffer);
     } catch (IOException e) {
       // The remote forcibly closed the connection, cancel
       // the selection key and close the channel.
@@ -114,7 +122,7 @@ public class MessageManager {
       return;
     }
 
-    System.out.println(new String(readBuffer.array()));
+    poolExecutor.execute(new TaskEcho(readBuffer, socketChannel));
   }
 
   public void stop(){
