@@ -56,4 +56,10 @@ public class Client implements  ReadListener{
     System.out.println(byteBuffer.position());
     System.out.println(new String(byteBuffer.array()));
   }
+
+
+  public static void main(String... args){
+    Client client = new Client("localhost", 4463);
+    client.connect();
+  }
 }
