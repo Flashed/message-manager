@@ -1,5 +1,3 @@
-package manager.server;
-
 import java.io.IOException;
 
 /**
