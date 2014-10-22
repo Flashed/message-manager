@@ -13,7 +13,7 @@
         <mkdir dir="build/jar"/>
         <jar destfile="build/jar/message-manager.jar" basedir="build/classes">
             <manifest>
-                <attribute name="Main-Class" value="Main"/>
+                <attribute name="manager.server.Main-Class" value="manager.server.Main"/>
             </manifest>
         </jar>
     </target>

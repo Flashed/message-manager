@@ -1,8 +1,13 @@
+import task.TaskEcho;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.nio.channels.*;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.Iterator;
 import java.util.concurrent.Executors;
@@ -11,7 +16,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  * @author Mikhail Zaitsev
  */
-public class MessageManager {
+public class Server {
 
   private boolean started;
 
@@ -23,7 +28,7 @@ public class MessageManager {
 
   private ThreadPoolExecutor poolExecutor;
 
-  public MessageManager(int port, int nThread) {
+  public Server(int port, int nThread) {
     this.port = port;
     this.nThread = nThread;
   }
@@ -82,7 +87,7 @@ public class MessageManager {
 
 
   private void accept(SelectionKey key) throws IOException {
-    // For an accept to be pending the channel must be a server socket channel.
+    // For an accept to be pending the channel must be a manager.server socket channel.
     ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
 
     // Accept the connection and make it non-blocking
