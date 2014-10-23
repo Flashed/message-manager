@@ -1,3 +1,4 @@
+import org.postgresql.jdbc2.optional.PoolingDataSource;
 import task.TaskEcho;
 
 import java.io.IOException;
@@ -28,12 +29,16 @@ public class Server {
 
   private ThreadPoolExecutor poolExecutor;
 
+  private PoolingDataSource poolingDataSource;
+
   public Server(int port, int nThread) {
     this.port = port;
     this.nThread = nThread;
   }
 
   public void init() throws IOException {
+
+    poolingDataSource = new PoolingDataSource();
 
     poolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nThread);
 
