@@ -1,4 +1,4 @@
-import command.Command;
+import server.command.Command;
 
 /**
  * Генератор комманд

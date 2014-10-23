@@ -1,4 +1,4 @@
-package task;
+package server.task;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

@@ -1,5 +1,7 @@
+package server;
+
 import org.postgresql.jdbc2.optional.PoolingDataSource;
-import task.TaskEcho;
+import server.task.TaskEcho;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -23,24 +25,15 @@ public class Server {
 
   private int port;
 
-  private int nThread;
-
   private Selector selector;
 
   private ThreadPoolExecutor poolExecutor;
 
-  private PoolingDataSource poolingDataSource;
-
-  public Server(int port, int nThread) {
+  public Server(int port) {
     this.port = port;
-    this.nThread = nThread;
   }
 
   public void init() throws IOException {
-
-    poolingDataSource = new PoolingDataSource();
-
-    poolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nThread);
 
     selector = SelectorProvider.provider().openSelector();
 
@@ -139,9 +132,13 @@ public class Server {
     started = false;
   }
 
+  public void setPoolExecutor(ThreadPoolExecutor poolExecutor) {
+    this.poolExecutor = poolExecutor;
+  }
+
   public static void main(String... args) throws IOException {
     System.out.println("Application started.");
-    Server messageManager = new Server(4463, 2);
+    Server messageManager = new Server(4463);
     messageManager.init();
     messageManager.start();
 

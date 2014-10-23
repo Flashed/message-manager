@@ -1,7 +1,7 @@
-package command;
+package server.command;
 
 /**
- * The abstract command
+ * The abstract server.command
  */
 public abstract class Command {
 
