@@ -1,6 +1,6 @@
 package server;
 
-import org.postgresql.jdbc2.optional.PoolingDataSource;
+import server.context.AppContext;
 import server.task.TaskEcho;
 
 import java.io.IOException;
@@ -13,7 +13,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.Iterator;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -138,9 +137,10 @@ public class Server {
 
   public static void main(String... args) throws IOException {
     System.out.println("Application started.");
-    Server messageManager = new Server(4463);
-    messageManager.init();
-    messageManager.start();
+
+    Server server = AppContext.getAppContext().getServer();
+    server.init();
+    server.start();
 
   }
 

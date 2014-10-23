@@ -14,7 +14,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class AppContext {
 
-  private static AppContext appContext = new AppContext();
+  private static AppContext appContext;
 
   private  PoolingDataSource poolingDataSource;
 
@@ -43,10 +43,14 @@ public class AppContext {
     poolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Config.getNumberThread());
 
     server = new Server(Config.getPort());
+    server.setPoolExecutor(poolExecutor);
 
   }
 
   public static AppContext getAppContext() {
+    if(appContext == null){
+      appContext = new AppContext();
+    }
     return appContext;
   }
 
