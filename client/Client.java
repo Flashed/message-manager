@@ -35,16 +35,15 @@ public class Client implements  ReadListener{
 
 
   private void startWriter(){
+
+    CommandGenerator commandGenerator = new CommandGenerator();
+
     try{
-      ByteBuffer buffer = ByteBuffer.allocate(10);
-      BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-      String line = null;
-      while((line = reader.readLine()) != null){
-        buffer.put(line.getBytes());
-        buffer.flip();
-        socketChannel.write(buffer);
-        buffer.clear();
-      }
+      ByteBuffer buffer = ByteBuffer.allocate(1024);
+      buffer.put(commandGenerator.getCreateQueueCommand().getBytes());
+      buffer.flip();
+      socketChannel.write(buffer);
+      buffer.clear();
     }catch (Exception e){
       e.printStackTrace();
     }
@@ -53,7 +52,6 @@ public class Client implements  ReadListener{
 
   @Override
   public void readBByteBuffer(ByteBuffer byteBuffer) {
-    System.out.println(byteBuffer.position());
     System.out.println(new String(byteBuffer.array()));
   }
 

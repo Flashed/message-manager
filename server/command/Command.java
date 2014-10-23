@@ -1,9 +1,12 @@
 package command;
 
 /**
- * @author Mikhail Zaitsev
+ * The abstract command
  */
 public abstract class Command {
+
+  public static final String CREATE_QUEUE = "create_queue";
+
 
   private String type;
 
