@@ -1,0 +1,5 @@
+<cmd>
+    <type>create_queue</type>
+    <clientId></clientId>
+    <queueId></queueId>
+</cmd>
