@@ -19,7 +19,7 @@
 
     <target name="compile-server">
         <mkdir dir="build/server/classes"/>
-        <javac srcdir="server" classpathref="build.server.classpath" destdir="build/server/classes"/>
+        <javac srcdir="server" debug="true" classpathref="build.server.classpath" destdir="build/server/classes"/>
     </target>
 
     <target name="libs-server">

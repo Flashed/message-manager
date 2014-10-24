@@ -1,6 +1,6 @@
-package server.dao;
+package sr.dao;
 
-import server.model.Client;
+import sr.model.Client;
 
 import java.util.List;
 

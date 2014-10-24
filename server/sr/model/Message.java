@@ -1,4 +1,4 @@
-package server.model;
+package sr.model;
 
 /**
  * Message

@@ -1,7 +1,7 @@
-package server.dao;
+package sr.dao;
 
-import server.context.AppContext;
-import server.model.Client;
+import sr.context.AppContext;
+import sr.model.Client;
 
 import java.sql.Connection;
 import java.sql.SQLException;

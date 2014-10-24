@@ -1,16 +1,19 @@
-package server.context;
+package sr.context;
 
-import server.Config;
-import server.Server;
-import server.dao.ClientDao;
+import sr.Config;
+import sr.Server;
+import sr.dao.ClientDao;
 import org.postgresql.jdbc2.optional.PoolingDataSource;
-import server.dao.ClientDaoImpl;
+import sr.dao.ClientDaoImpl;
 
+import java.nio.channels.Channel;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * Application server.context
+ * Application sr.context
  */
 public class AppContext {
 
@@ -26,8 +29,13 @@ public class AppContext {
 
   private ClientDao clientDao;
 
-  public AppContext() {
+  private Map<Channel, StringBuilder> commandBuffers = new HashMap();
 
+  private AppContext() {
+
+  }
+
+  public void init(){
     config = new Config();
     config.init();
 
@@ -50,6 +58,7 @@ public class AppContext {
   public static AppContext getAppContext() {
     if(appContext == null){
       appContext = new AppContext();
+      appContext.init();
     }
     return appContext;
   }
@@ -60,6 +69,10 @@ public class AppContext {
 
   public Server getServer() {
     return server;
+  }
+
+  public Map<Channel, StringBuilder> getCommandBuffers() {
+    return commandBuffers;
   }
 
   public Config getConfig() {

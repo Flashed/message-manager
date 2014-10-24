@@ -1,9 +1,9 @@
-package server.model;
+package sr.model;
 
 /**
- * Client
+ * Queue
  */
-public class Client {
+public class Queue {
 
   private int id;
 

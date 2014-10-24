@@ -1,7 +1,7 @@
-package server;
+package sr;
 
-import server.context.AppContext;
-import server.task.TaskEcho;
+import sr.context.AppContext;
+import sr.task.TaskEcho;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -84,7 +84,7 @@ public class Server {
 
 
   private void accept(SelectionKey key) throws IOException {
-    // For an accept to be pending the channel must be a manager.server socket channel.
+    // For an accept to be pending the channel must be a manager.sr socket channel.
     ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
 
     // Accept the connection and make it non-blocking
@@ -135,12 +135,17 @@ public class Server {
     this.poolExecutor = poolExecutor;
   }
 
-  public static void main(String... args) throws IOException {
-    System.out.println("Application started.");
+  public static void main(String... args) {
+    try {
+      System.out.println("Application started.");
 
-    Server server = AppContext.getAppContext().getServer();
-    server.init();
-    server.start();
+      Server server = AppContext.getAppContext().getServer();
+      server.init();
+      server.start();
+    } catch (Exception e){
+      e.printStackTrace();
+    }
+
 
   }
 
