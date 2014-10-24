@@ -78,4 +78,8 @@ public class AppContext {
   public Config getConfig() {
     return config;
   }
+
+  public ThreadPoolExecutor getPoolExecutor() {
+    return poolExecutor;
+  }
 }

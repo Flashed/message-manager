@@ -1,7 +1,7 @@
 package sr;
 
 import sr.context.AppContext;
-import sr.task.TaskEcho;
+import sr.task.ParseTask;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -124,7 +124,7 @@ public class Server {
       return;
     }
 
-    poolExecutor.execute(new TaskEcho(readBuffer, socketChannel));
+    poolExecutor.execute(new ParseTask(readBuffer, socketChannel));
   }
 
   public void stop(){
