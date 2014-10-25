@@ -1,5 +1,5 @@
 <cmd>
     <type>create_queue</type>
-    <clientId></clientId>
-    <queueId></queueId>
+    <clientId>1</clientId>
+    <queueId>2</queueId>
 </cmd>

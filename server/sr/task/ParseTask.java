@@ -12,11 +12,15 @@ import java.nio.channels.Channel;
 import java.nio.channels.SocketChannel;
 import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Mikhail Zaitsev
  */
 public class ParseTask implements Runnable {
+
+  private static final Logger logger = Logger.getLogger(ParseTask.class.getName());
 
   private ByteBuffer readBuffer;
 
@@ -41,10 +45,8 @@ public class ParseTask implements Runnable {
           buffer.setLength(0);
         }
       }
-
-      System.out.println(String.format("Executed %s in %s", getClass().getName(), Thread.currentThread().getName()));
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.log(Level.SEVERE, "Error parse task" , e);
     }
   }
 
@@ -87,7 +89,9 @@ public class ParseTask implements Runnable {
 
       return command;
 
-    }catch (Exception ignore){}
+    }catch (Exception e){
+      logger.log(Level.SEVERE, "Error parse CreateQueueCommand" , e);
+    }
     return null;
   }
 
@@ -96,7 +100,7 @@ public class ParseTask implements Runnable {
     byte[] bytes = readBuffer.array();
     for(int i = readBuffer.position(); i<readBuffer.limit(); i++){
       if(buffer.length() > (5*1024)){
-        System.out.println("The command > 5KB");
+        logger.warning("The command > 5KB for " + clientChanel);
         buffer.setLength(0);
         break;
       }

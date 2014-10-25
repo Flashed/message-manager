@@ -14,6 +14,7 @@
         </fileset>
         <fileset dir="resources">
             <include name="config.properties" />
+            <include name="logging.properties" />
         </fileset>
     </path>
 
@@ -32,7 +33,9 @@
     <target name="build-server">
         <antcall target="libs-server" />
         <mkdir dir="build/server/config" />
+        <mkdir dir="build/server/logs" />
         <copyfile src="resources/config.properties"  dest="build/server/config/config.properties" />
+        <copyfile src="resources/logging.properties"  dest="build/server/config/logging.properties" />
         <copyfile src="resources/run.sh"  dest="build/server/run.sh" />
         <delete dir="build/server/classes" />
 

@@ -3,6 +3,7 @@ package sr;
 import sr.context.AppContext;
 import sr.task.ParseTask;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -14,12 +15,17 @@ import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.Iterator;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 /**
  * @author Mikhail Zaitsev
  */
 public class Server {
 
+  private static final Logger logger = Logger.getLogger(Server.class.getName());
+  
   private boolean started;
 
   private int port;
@@ -73,11 +79,11 @@ public class Server {
           } else if (key.isReadable()) {
             read(key);
           } else{
-            System.out.println("Other key type");
+            logger.info("Other type key: " + key.toString());
           }
         }
       } catch (Exception e) {
-        e.printStackTrace();
+        logger.log(Level.SEVERE, "Error server work", e);
       }
     }
   }
@@ -95,6 +101,8 @@ public class Server {
     // Register the new SocketChannel with our Selector, indicating
     // we'd like to be notified when there's data waiting to be read
     socketChannel.register(this.selector, SelectionKey.OP_READ);
+
+    logger.info("Connected: " + socketChannel);
   }
 
   private void read(SelectionKey key) throws IOException {
@@ -137,13 +145,20 @@ public class Server {
 
   public static void main(String... args) {
     try {
-      System.out.println("Application started.");
+
+      try {
+        LogManager.getLogManager().readConfiguration(Server.class.getClassLoader().getResourceAsStream("logging.properties"));
+      } catch (SecurityException | IOException e1) {
+        logger.log(Level.SEVERE, "Error config logger", e1);
+      }
+
+      logger.info("Application started.");
 
       Server server = AppContext.getAppContext().getServer();
       server.init();
       server.start();
     } catch (Exception e){
-      e.printStackTrace();
+      logger.log(Level.SEVERE, "", e);
     }
 
 
