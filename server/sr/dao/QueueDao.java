@@ -2,6 +2,8 @@ package sr.dao;
 
 import sr.model.Queue;
 
+import java.util.List;
+
 /**
  * Dao of Queue
  */
@@ -29,5 +31,11 @@ public interface QueueDao {
    * @param id id of Queue
    */
   void delete(int id);
+
+  /**
+   * Get all queues
+   * @return  all queues
+   */
+  List<Queue> getAll();
 
 }

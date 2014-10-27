@@ -10,6 +10,7 @@ public class CreateQueueCommand extends Command{
   private int queueId;
 
   public CreateQueueCommand() {
+    setType(CREATE_QUEUE);
   }
 
   public int getClientId() {

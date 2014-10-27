@@ -22,7 +22,7 @@ public class CreateQueueTask implements Runnable{
 
   private CreateQueueCommand command;
 
-  private SocketChannel clientChannel;
+  private final SocketChannel clientChannel;
 
   public CreateQueueTask(CreateQueueCommand command, SocketChannel clientChannel) {
     this.command = command;
@@ -42,15 +42,19 @@ public class CreateQueueTask implements Runnable{
 
       logger.info("Created: "+ queue);
 
-      clientChannel.write(ByteBuffer.wrap(
-              new SuccessAnswer("The queue created").toString().getBytes()));
+      synchronized (clientChannel){
+        clientChannel.write(ByteBuffer.wrap(
+                new SuccessAnswer("The queue created").toString().getBytes()));
 
+      }
     } catch (Exception e){
       logger.log(Level.SEVERE, "Error create Queue Task", e);
 
       try {
-        clientChannel.write(ByteBuffer.wrap(
-                new ErrorAnswer("The queue not created").toString().getBytes()));
+        synchronized (clientChannel){
+          clientChannel.write(ByteBuffer.wrap(
+                  new ErrorAnswer("The queue not created").toString().getBytes()));
+        }
       } catch (IOException e1) {
         logger.log(Level.SEVERE, "Error answer not sand", e1);
       }

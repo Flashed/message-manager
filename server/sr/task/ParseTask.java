@@ -2,6 +2,7 @@ package sr.task;
 
 import sr.command.Command;
 import sr.command.CreateQueueCommand;
+import sr.command.QueueListCommand;
 import sr.context.AppContext;
 
 import java.io.IOException;
@@ -41,6 +42,8 @@ public class ParseTask implements Runnable {
           Command command = parseCommand(buffer);
           if(command instanceof CreateQueueCommand){
             getExecutor().execute(new CreateQueueTask((CreateQueueCommand) command, clientChanel));
+          } else if(command instanceof  QueueListCommand){
+            getExecutor().execute(new GetQueueListTask(clientChanel));
           }
           buffer.setLength(0);
         }
@@ -69,6 +72,8 @@ public class ParseTask implements Runnable {
 
     if(Command.CREATE_QUEUE.equals(type)){
       return parseCreateQueueCommand(data);
+    } else if (Command.QUEUE_LIST.equals(type)){
+      return new QueueListCommand();
     }
 
     return null;

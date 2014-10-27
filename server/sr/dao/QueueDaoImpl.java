@@ -3,10 +3,9 @@ package sr.dao;
 import sr.context.AppContext;
 import sr.model.Queue;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,6 +44,31 @@ public class QueueDaoImpl implements QueueDao{
   @Override
   public void delete(int id) {
 
+  }
+
+  @Override
+  public List<Queue> getAll() {
+    List<Queue> result = new ArrayList<>();
+    try {
+      String sql = "select * from queues";
+      Connection connection = getConnection();
+      PreparedStatement statement = connection.prepareStatement(sql);
+      ResultSet resultSet =  statement.executeQuery();
+      if(resultSet != null){
+        while(resultSet.next()){
+          Queue queue = new Queue();
+          queue.setId(resultSet.getInt("id"));
+          result.add(queue);
+        }
+        return  result;
+      }
+    } catch (SQLException e) {
+      RuntimeException wrap = new RuntimeException("Error get list of queues ", e);
+      logger.log(Level.SEVERE, "", e);
+      throw wrap;
+
+    }
+    return result;
   }
 
   private Connection getConnection() throws SQLException {

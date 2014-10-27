@@ -6,6 +6,7 @@ package sr.command;
 public abstract class Command {
 
   public static final String CREATE_QUEUE = "create_queue";
+  public static final String QUEUE_LIST = "queue_list";
 
 
   private String type;
