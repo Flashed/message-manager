@@ -40,7 +40,7 @@ public class ParseTask implements Runnable {
         if(checkBuffer(buffer)){
           Command command = parseCommand(buffer);
           if(command instanceof CreateQueueCommand){
-            getExecutor().execute(new CreateQueueTask((CreateQueueCommand) command));
+            getExecutor().execute(new CreateQueueTask((CreateQueueCommand) command, clientChanel));
           }
           buffer.setLength(0);
         }

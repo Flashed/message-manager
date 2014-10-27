@@ -5,6 +5,8 @@ import sr.Server;
 import sr.dao.ClientDao;
 import org.postgresql.jdbc2.optional.PoolingDataSource;
 import sr.dao.ClientDaoImpl;
+import sr.dao.QueueDao;
+import sr.dao.QueueDaoImpl;
 
 import java.nio.channels.Channel;
 import java.util.HashMap;
@@ -29,6 +31,8 @@ public class AppContext {
 
   private ClientDao clientDao;
 
+  private QueueDao queueDao;
+
   private Map<Channel, StringBuilder> commandBuffers = new HashMap();
 
   private AppContext() {
@@ -52,6 +56,8 @@ public class AppContext {
 
     server = new Server(Config.getPort());
     server.setPoolExecutor(poolExecutor);
+
+    queueDao = new QueueDaoImpl();
 
   }
 
@@ -81,5 +87,13 @@ public class AppContext {
 
   public ThreadPoolExecutor getPoolExecutor() {
     return poolExecutor;
+  }
+
+  public ClientDao getClientDao() {
+    return clientDao;
+  }
+
+  public QueueDao getQueueDao() {
+    return queueDao;
   }
 }

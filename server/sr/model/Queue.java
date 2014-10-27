@@ -14,4 +14,11 @@ public class Queue {
   public void setId(int id) {
     this.id = id;
   }
+
+  @Override
+  public String toString() {
+    return "Queue{" +
+            "id=" + id +
+            '}';
+  }
 }
