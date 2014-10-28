@@ -12,7 +12,7 @@ public class SuccessAnswer extends Answer{
   @Override
   public String toString(){
     return "<ans>\n" +
-            "    <type>success</type>\n" +
+            "    <type>"+ getType() +"</type>\n" +
             "    <mes>"+getMessage()+"</mes>\n" +
             "</ans>";
   }
