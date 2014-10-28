@@ -1,6 +1,6 @@
-package sr.answer;
+package cn.answer;
 
-import sr.model.Queue;
+import cn.model.Queue;
 
 import java.util.List;
 
@@ -12,7 +12,8 @@ public class QueueListAnswer extends Answer{
   private List<Queue> queues;
 
   public QueueListAnswer(List<Queue> queues) {
-    setType(Answer.QUEUES_LIST);
+    setType(QUEUES_LIST);
+    setMessage("ids of queues");
     this.queues = queues;
   }
 

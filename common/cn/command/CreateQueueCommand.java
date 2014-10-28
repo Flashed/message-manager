@@ -1,7 +1,7 @@
-package sr.command;
+package cn.command;
 
 /**
- * The server command - to create a queue
+ * The server cn.command - to create a queue
  */
 public class CreateQueueCommand extends Command{
 
@@ -27,5 +27,14 @@ public class CreateQueueCommand extends Command{
 
   public void setQueueId(int queueId) {
     this.queueId = queueId;
+  }
+
+  @Override
+  public String toString() {
+    return "<cmd>\n" +
+            "    <type>"+ getType() +"</type>\n" +
+            "    <clientId>"+ getClientId() +"</clientId>\n" +
+            "    <queueId>"+ getQueueId() +"</queueId>\n" +
+            "</cmd>";
   }
 }

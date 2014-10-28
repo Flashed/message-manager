@@ -1,7 +1,7 @@
-package sr.command;
+package cn.command;
 
 /**
- * The abstract sr.command
+ * The abstract sr.cn.command
  */
 public abstract class Command {
 

@@ -1,3 +1,5 @@
+import cn.answer.Answer;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -5,5 +7,5 @@ import java.nio.ByteBuffer;
  */
 public interface ReadListener {
 
-  void readBByteBuffer(ByteBuffer byteBuffer);
+  void readBByteBuffer(Answer answer);
 }

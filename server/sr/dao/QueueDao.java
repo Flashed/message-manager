@@ -1,6 +1,6 @@
 package sr.dao;
 
-import sr.model.Queue;
+import cn.model.Queue;
 
 import java.util.List;
 

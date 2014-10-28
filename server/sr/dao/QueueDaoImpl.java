@@ -1,7 +1,7 @@
 package sr.dao;
 
 import sr.context.AppContext;
-import sr.model.Queue;
+import cn.model.Queue;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -19,14 +19,17 @@ public class QueueDaoImpl implements QueueDao{
   @Override
   public void save(Queue queue) {
 
-    try {
-      String sql = "insert into queues values (?)";
-      Connection connection = getConnection();
-      PreparedStatement statement = connection.prepareStatement(sql);
+    String sql = "insert into queues values (?)";
+    try (
+        Connection connection = getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql)
+    ) {
       statement.setInt(1, queue.getId());
       if(statement.execute()){
         logger.info("Save " + queue);
       }
+      statement.close();
+      connection.close();
     } catch (SQLException e) {
       RuntimeException wrap = new RuntimeException("Error save queue", e);
       logger.log(Level.SEVERE, "", e);
@@ -49,17 +52,22 @@ public class QueueDaoImpl implements QueueDao{
   @Override
   public List<Queue> getAll() {
     List<Queue> result = new ArrayList<>();
-    try {
-      String sql = "select * from queues";
-      Connection connection = getConnection();
-      PreparedStatement statement = connection.prepareStatement(sql);
-      ResultSet resultSet =  statement.executeQuery();
+    String sql = "select * from queues";
+    try(
+            Connection connection = getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet resultSet =  statement.executeQuery()
+            ) {
+
       if(resultSet != null){
         while(resultSet.next()){
           Queue queue = new Queue();
           queue.setId(resultSet.getInt("id"));
           result.add(queue);
         }
+        resultSet.close();
+        statement.close();
+        connection.close();
         return  result;
       }
     } catch (SQLException e) {

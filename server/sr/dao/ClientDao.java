@@ -1,6 +1,6 @@
 package sr.dao;
 
-import sr.model.Client;
+import cn.model.Client;
 
 import java.util.List;
 

@@ -1,17 +1,12 @@
 package sr.task;
 
-import sr.command.Command;
-import sr.command.CreateQueueCommand;
-import sr.command.QueueListCommand;
+import cn.command.Command;
+import cn.command.CreateQueueCommand;
+import cn.command.QueueListCommand;
 import sr.context.AppContext;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channel;
 import java.nio.channels.SocketChannel;
-import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -105,7 +100,7 @@ public class ParseTask implements Runnable {
     byte[] bytes = readBuffer.array();
     for(int i = readBuffer.position(); i<readBuffer.limit(); i++){
       if(buffer.length() > (5*1024)){
-        logger.warning("The command > 5KB for " + clientChanel);
+        logger.warning("The cn.command > 5KB for " + clientChanel);
         buffer.setLength(0);
         break;
       }

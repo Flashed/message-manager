@@ -1,4 +1,4 @@
-package sr.model;
+package cn.model;
 
 /**
  * Queue

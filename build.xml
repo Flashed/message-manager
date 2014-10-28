@@ -4,6 +4,24 @@
         <delete dir="build"/>
     </target>
 
+    <!--Common>>>>>>>>>-->
+    <target name="compile-common">
+        <mkdir dir="build/common/classes"/>
+        <javac srcdir="common" debug="true" destdir="build/common/classes"/>
+    </target>
+
+    <target name="build-common">
+        <antcall target="compile-common" />
+        <mkdir dir="build/server/libs" />
+        <mkdir dir="build/client/libs" />
+        <jar destfile="build/server/libs/common.jar" basedir="build/common/classes" />
+        <copyfile src="build/server/libs/common.jar" dest="build/client/libs/common.jar" />
+        <copyfile src="build/server/libs/common.jar" dest="libs/common.jar" />
+        <delete dir="build/common/classes" />
+    </target>
+
+    <!--<<<<<<<<<Common-->
+
      <!--Server>>>>>>-->
     <path id="build.server.classpath">
         <fileset dir="libs">
@@ -12,37 +30,83 @@
         <fileset dir="build/server/classes">
             <include name="**/*.class" />
         </fileset>
-        <fileset dir="resources">
+        <fileset dir="resources/server">
             <include name="config.properties" />
+        </fileset>
+        <fileset dir="resources/server">
             <include name="logging.properties" />
         </fileset>
     </path>
 
     <target name="compile-server">
+        <antcall target="build-common" />
         <mkdir dir="build/server/classes"/>
-        <javac srcdir="server" debug="true" classpathref="build.server.classpath" destdir="build/server/classes"/>
+        <javac srcdir="server" classpathref="build.server.classpath" debug="true"  destdir="build/server/classes"/>
     </target>
 
     <target name="libs-server">
-        <antcall target="compile-server"/>
+        <antcall target="compile-server" />
         <mkdir dir="build/server/libs"/>
         <jar destfile="build/server/libs/server.jar" basedir="build/server/classes" />
         <copydir src="./libs/" dest="build/server/libs"/>
     </target>
 
     <target name="build-server">
+        <antcall target="build-common" />
         <antcall target="libs-server" />
         <mkdir dir="build/server/config" />
         <mkdir dir="build/server/logs" />
-        <copyfile src="resources/config.properties"  dest="build/server/config/config.properties" />
-        <copyfile src="resources/logging.properties"  dest="build/server/config/logging.properties" />
-        <copyfile src="resources/run.sh"  dest="build/server/run.sh" />
+        <copyfile src="resources/server/config.properties"  dest="build/server/config/config.properties" />
+        <copyfile src="resources/server/logging.properties"  dest="build/server/config/logging.properties" />
+        <copyfile src="resources/server/run.sh"  dest="build/server/run.sh" />
         <delete dir="build/server/classes" />
-
-    </target>
-
-    <target name="run-server">
-        <java classpathref="build.server.classpath" classname="server.Server" fork="true"/>
     </target>
     <!--<<<<server-->
+
+    <!--Client>>>>>>>>>-->
+    <path id="build.client.classpath">
+        <fileset dir="libs">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="build/client/classes">
+            <include name="**/*.class" />
+        </fileset>
+        <fileset dir="resources/client">
+            <include name="config.properties" />
+        </fileset>
+        <fileset dir="resources/client">
+            <include name="logging.properties" />
+        </fileset>
+    </path>
+
+    <target name="compile-client">
+        <antcall target="build-common" />
+        <mkdir dir="build/client/classes"/>
+        <javac srcdir="client" classpathref="build.client.classpath" debug="true"  destdir="build/client/classes"/>
+    </target>
+    <target name="libs-client">
+        <antcall target="compile-client" />
+        <mkdir dir="build/client/libs"/>
+        <jar destfile="build/client/libs/client.jar" basedir="build/client/classes" />
+        <copydir src="./libs/" dest="build/client/libs"/>
+    </target>
+
+    <target name="build-client">
+        <antcall target="build-common" />
+        <antcall target="libs-client" />
+        <mkdir dir="build/client/config" />
+        <mkdir dir="build/client/logs" />
+        <copyfile src="resources/client/config.properties"  dest="build/client/config/config.properties" />
+        <copyfile src="resources/client/inputCommands.txt"  dest="build/client/config/inputCommands.txt" />
+        <copyfile src="resources/client/logging.properties"  dest="build/client/config/logging.properties" />
+        <copyfile src="resources/client/run.sh"  dest="build/client/run.sh" />
+        <delete dir="build/client/classes" />
+    </target>
+    <!--<<<<<<<<<Client-->
+
+    <target name="build-all">
+        <antcall target="build-client"/>
+        <antcall target="build-server" />
+    </target>
+
 </project>

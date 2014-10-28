@@ -1,4 +1,4 @@
-package sr.answer;
+package cn.answer;
 
 /**
  * A success answer
