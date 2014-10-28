@@ -7,6 +7,7 @@ public class SuccessAnswer extends Answer{
 
   public SuccessAnswer(String message) {
     setMessage(message);
+    setType(Answer.SUCCESS);
   }
 
   @Override

@@ -1,4 +1,5 @@
 import cn.answer.Answer;
+import cn.answer.ErrorAnswer;
 import cn.answer.SuccessAnswer;
 
 import java.nio.ByteBuffer;
@@ -69,21 +70,35 @@ public class TaskRead implements Runnable{
     type = type.substring(0, type.indexOf("</type>"));
 
     if(Answer.SUCCESS.equals(type)){
-      return parseSimpleAnswer(data);
+      return parseSuccessAnswer(data);
     } else if (Answer.ERROR.equals(type)){
-      return parseSimpleAnswer(data);
+      return parseErrorAnswer(data);
     }
 
     return null;
   }
 
-  private SuccessAnswer parseSimpleAnswer(String data){
+  private SuccessAnswer parseSuccessAnswer(String data){
     try{
 
       String mes = data.substring(data.indexOf("<mes>") + 5);
       mes = mes.substring(0, mes.indexOf("</mes>"));
 
       return new SuccessAnswer(mes);
+
+    }catch (Exception e){
+      logger.log(Level.SEVERE, "Error parse CreateQueueCommand" , e);
+    }
+    return null;
+  }
+
+  private ErrorAnswer parseErrorAnswer(String data){
+    try{
+
+      String mes = data.substring(data.indexOf("<mes>") + 5);
+      mes = mes.substring(0, mes.indexOf("</mes>"));
+
+      return new ErrorAnswer(mes);
 
     }catch (Exception e){
       logger.log(Level.SEVERE, "Error parse CreateQueueCommand" , e);
