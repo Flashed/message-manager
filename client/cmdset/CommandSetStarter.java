@@ -1,5 +1,4 @@
-import cn.command.Command;
-import cn.command.CreateQueueCommand;
+package cmdset;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -10,19 +9,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Генератор команд
+ * Read ant start command set
  */
-public class CommandExecutor {
+public class CommandSetStarter {
 
-  private static final Logger logger = Logger.getLogger(CommandExecutor.class.getName());
+  private static final Logger logger = Logger.getLogger(CommandSetStarter.class.getName());
 
-  private ExecutorListener listener;
+  private CommandSetStarterListener listener;
 
-  private List<CmdExec> cmdExecList = new ArrayList<>();
+  private List<CommandSet> cmdExecList = new ArrayList<>();
 
   private long timeoutExec;
 
-  public CommandExecutor(long timeoutExec, ExecutorListener listener) {
+  public CommandSetStarter(long timeoutExec, CommandSetStarterListener listener) {
     if(timeoutExec <= 0){
       this.timeoutExec = 10;
     }else{
@@ -48,17 +47,17 @@ public class CommandExecutor {
         if(chunks == null){
           continue;
         }
-        CmdExec cmdExec = new CmdExec();
+        CommandSet cmdExec = new CommandSet();
         if(chunks.length == 1){
-          cmdExec.setCommandType(chunks[0]);
+          cmdExec.setType(chunks[0]);
           cmdExecList.add(cmdExec);
         } else if(chunks.length == 2){
-          cmdExec.setCommandType(chunks[0]);
+          cmdExec.setType(chunks[0]);
           int c = 0;
           try{
             c = Integer.valueOf(chunks[1]);
           }catch (Exception ignore){}
-          cmdExec.setCount(c==0 ? 1 : c);
+          cmdExec.setExecCount(c == 0 ? 1 : c);
           cmdExecList.add(cmdExec);
         }
       }
@@ -67,15 +66,15 @@ public class CommandExecutor {
     }
   }
 
-  public void execute(){
+  public void start(){
 
-      for(CmdExec cmdExec: cmdExecList){
-        for(int i=0; i<cmdExec.getCount(); i++){
+      for(CommandSet cmdExec: cmdExecList){
+        for(int i=0; i<cmdExec.getExecCount(); i++){
           if(listener != null){
-            if(Command.CREATE_QUEUE.equals(cmdExec.getCommandType())){
-              listener.onGetCommand(createCreateQueueCommand());
+            if(CommandSet.TYPE_CREATE_QUEUES.equals(cmdExec.getType())){
+              listener.onGetCommandSet(cmdExec);
             }
-            logger.info(String.format("Execute  %s iteration %s", cmdExec.getCommandType(), i+1));
+            logger.info(String.format("Execute  %s iteration %s", cmdExec.getType(), i+1));
             try {
               Thread.sleep(timeoutExec);
             } catch (InterruptedException ignore) {
@@ -85,12 +84,6 @@ public class CommandExecutor {
       }
 
 
-  }
-
-  private CreateQueueCommand createCreateQueueCommand(){
-    CreateQueueCommand cmd = new CreateQueueCommand();
-    cmd.setQueueId((int)(Math.random()*100000));
-    return cmd;
   }
 
 }

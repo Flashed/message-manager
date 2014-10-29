@@ -1,10 +1,16 @@
-import cn.answer.Answer;
-import cn.command.Command;
+import cmdset.CommandSet;
+import cmdset.CommandSetStarter;
+import cmdset.CommandSetStarterListener;
+import cmdset.executor.CommandSetExecutor;
+import cmdset.executor.CreateQueueExecutor;
+import read.TaskRead;
+import statistic.StatisticService;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -12,7 +18,7 @@ import java.util.logging.Logger;
 /**
  * @author Mikhail Zaitsev
  */
-public class Client implements  ReadListener, ExecutorListener{
+public class Client implements CommandSetStarterListener {
 
   private static final Logger logger = Logger.getLogger(Client.class.getName());
 
@@ -24,6 +30,13 @@ public class Client implements  ReadListener, ExecutorListener{
 
   private SocketChannel socketChannel;
 
+  private Map<String, CommandSetExecutor> setExecutorsMap = new HashMap<>();
+
+  private TaskRead taskRead;
+
+  private StatisticService statisticService;
+
+
   public Client(String host, int port, long timeoutExec) {
     this.host = host;
     this.port = port;
@@ -33,8 +46,8 @@ public class Client implements  ReadListener, ExecutorListener{
   public void connect(){
     try {
       socketChannel = SocketChannel.open(new InetSocketAddress(host, port));
-      new Thread(new TaskRead(socketChannel, this))
-              .start();
+      taskRead = new TaskRead(socketChannel);
+      new Thread(taskRead).start();
       logger.info(String.format("Connected to %s:%s",host, port));
       startExecutor();
     } catch (IOException e) {
@@ -44,16 +57,28 @@ public class Client implements  ReadListener, ExecutorListener{
 
 
   private void startExecutor(){
-    CommandExecutor commandGenerator = new CommandExecutor(timeoutExec, this);
-    commandGenerator.execute();
+    statisticService = new StatisticService();
+
+    CreateQueueExecutor createQueueExecutor = new CreateQueueExecutor(socketChannel, statisticService);
+    setExecutorsMap.put(CommandSet.TYPE_CREATE_QUEUES,createQueueExecutor);
+
+    CommandSetStarter commandGenerator = new CommandSetStarter(timeoutExec, this);
+    commandGenerator.start();
   }
 
 
   @Override
-  public void readBByteBuffer(Answer answer) {
-    System.out.println(answer);
-  }
+  public void onGetCommandSet(CommandSet commandSet) {
+    if(commandSet == null){
+      return;
+    }
+    if(setExecutorsMap.containsKey(commandSet.getType())){
+      CommandSetExecutor executor = setExecutorsMap.get(commandSet.getType());
+      taskRead.setReadListener(executor);
+      executor.execute(commandSet);
+    }
 
+  }
 
   public static void main(String... args){
 
@@ -71,16 +96,4 @@ public class Client implements  ReadListener, ExecutorListener{
     client.connect();
   }
 
-  @Override
-  public void onGetCommand(Command command) {
-    try{
-      ByteBuffer buffer = ByteBuffer.allocate(1024);
-      buffer.put(command.toString().getBytes());
-      buffer.flip();
-      socketChannel.write(buffer);
-      buffer.clear();
-    }catch (Exception e){
-      logger.log(Level.SEVERE, "Error send command ", e);
-    }
-  }
 }

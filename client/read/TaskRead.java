@@ -1,3 +1,5 @@
+package read;
+
 import cn.answer.Answer;
 import cn.answer.ErrorAnswer;
 import cn.answer.SuccessAnswer;
@@ -22,15 +24,14 @@ public class TaskRead implements Runnable{
 
   private StringBuilder charBuffer = new StringBuilder();
 
-  public TaskRead(SocketChannel socketChannel, ReadListener readListener) {
+  public TaskRead(SocketChannel socketChannel) {
     this.socketChannel = socketChannel;
-    this.readListener = readListener;
   }
 
   @Override
   public void run() {
 
-    if(readListener == null || socketChannel == null){
+    if(socketChannel == null){
       return;
     }
 
@@ -40,8 +41,10 @@ public class TaskRead implements Runnable{
       while((num = socketChannel.read(readBuffer)) != -1){
         writeToCharBuffer();
         if(checkBuffer()){
-          Answer answer = parseAnswer();
-          readListener.readBByteBuffer(answer);
+          if(readListener != null){
+            Answer answer = parseAnswer();
+            readListener.onReadAnswer(answer);
+          }
           readBuffer.clear();
           charBuffer.setLength(0);
         }
@@ -120,4 +123,11 @@ public class TaskRead implements Runnable{
   }
 
 
+  public void setReadListener(ReadListener readListener) {
+    this.readListener = readListener;
+  }
+
+  public ReadListener getReadListener() {
+    return readListener;
+  }
 }
