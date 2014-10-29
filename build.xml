@@ -17,7 +17,7 @@
         <jar destfile="build/server/libs/common.jar" basedir="build/common/classes" />
         <copyfile src="build/server/libs/common.jar" dest="build/client/libs/common.jar" />
         <copyfile src="build/server/libs/common.jar" dest="libs/common.jar" />
-        <delete dir="build/common/classes" />
+        <delete dir="build/common" />
     </target>
 
     <!--<<<<<<<<<Common-->
