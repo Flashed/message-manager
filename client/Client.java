@@ -36,11 +36,14 @@ public class Client implements CommandSetStarterListener {
 
   private StatisticService statisticService;
 
+  private int clientId;
 
-  public Client(String host, int port, long timeoutExec) {
+
+  public Client(String host, int port, long timeoutExec, int clientId) {
     this.host = host;
     this.port = port;
     this.timeoutExec = timeoutExec;
+    this.clientId = clientId;
   }
 
   public void connect(){
@@ -58,6 +61,7 @@ public class Client implements CommandSetStarterListener {
 
   private void startExecutor(){
     statisticService = new StatisticService();
+    statisticService.setClientId(clientId);
 
     CreateQueueExecutor createQueueExecutor = new CreateQueueExecutor(socketChannel, statisticService);
     setExecutorsMap.put(CommandSet.TYPE_CREATE_QUEUES,createQueueExecutor);
@@ -92,7 +96,8 @@ public class Client implements CommandSetStarterListener {
 
     Client client = new Client(Config.getServerHost(),
             Config.getServerPort(),
-            Config.getExecTimeout());
+            Config.getExecTimeout(),
+            Config.getClientId());
     client.connect();
   }
 

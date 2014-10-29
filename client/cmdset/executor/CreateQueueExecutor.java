@@ -17,9 +17,12 @@ public class CreateQueueExecutor implements CommandSetExecutor{
 
   private static final Logger logger = Logger.getLogger(CreateQueueExecutor.class.getName());
 
+  private static final String COMMAND_SET_TYPE = CommandSet.TYPE_CREATE_QUEUES;
+
   private SocketChannel socketChannel;
 
   private StatisticService statisticService;
+
 
   public CreateQueueExecutor(SocketChannel socketChannel, StatisticService statisticService) {
     this.socketChannel = socketChannel;
@@ -41,7 +44,7 @@ public class CreateQueueExecutor implements CommandSetExecutor{
 
   @Override
   public void onReadAnswer(Answer answer) {
-    statisticService.write(answer);
+    statisticService.write(COMMAND_SET_TYPE, answer);
   }
 
   private CreateQueueCommand createCreateQueueCommand(){

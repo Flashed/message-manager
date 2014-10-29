@@ -44,7 +44,7 @@ public class Config {
     try{
       return Integer.valueOf(getProp("client.id"));
     } catch (Exception e){
-      return 0;
+      return -1;
     }
   }
 

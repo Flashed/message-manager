@@ -24,6 +24,7 @@ public class SuccessAnswer extends Answer{
             "    <timeOfExecSql>"+getTimeOfExecSql()+"</timeOfExecSql>\n" +
             "    <timeOfExecuteServer>"+getTimeOfExecuteServer()+"</timeOfExecuteServer>\n" +
             "    <dateAnswer>"+getDateAnswer()+"</dateAnswer>\n" +
+            "    <dateAnswer>"+getDateAnswer()+"</dateAnswer>\n" +
             "</ans>";
   }
 
