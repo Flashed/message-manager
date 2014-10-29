@@ -1,5 +1,6 @@
 package sr.task;
 
+import cn.answer.Answer;
 import cn.answer.ErrorAnswer;
 import cn.answer.SuccessAnswer;
 import cn.command.CreateQueueCommand;
@@ -32,19 +33,24 @@ public class CreateQueueTask implements Runnable{
   @Override
   public void run() {
 
+    long startExecTime = System.currentTimeMillis();
     try{
-
-      Queue queue = new Queue();
+     Queue queue = new Queue();
       queue.setId(command.getQueueId());
 
       QueueDao dao = getQueueDao();
+
+      long startExecSqlTime = System.currentTimeMillis();
       dao.save(queue);
+      long endExecSqlTime = System.currentTimeMillis() - startExecSqlTime;
 
       logger.info("Created: "+ queue);
 
       synchronized (clientChannel){
+        SuccessAnswer answer = new SuccessAnswer("The queue created");
+        setTimeToAnswer(answer, startExecTime, endExecSqlTime);
         clientChannel.write(ByteBuffer.wrap(
-                new SuccessAnswer("The queue created").toString().getBytes()));
+                answer.toString().getBytes()));
 
       }
     } catch (Exception e){
@@ -52,13 +58,23 @@ public class CreateQueueTask implements Runnable{
 
       try {
         synchronized (clientChannel){
+          ErrorAnswer answer = new ErrorAnswer("The queue not created");
+          setTimeToAnswer(answer, startExecTime, 0);
           clientChannel.write(ByteBuffer.wrap(
-                  new ErrorAnswer("The queue not created").toString().getBytes()));
+                  answer.toString().getBytes()));
         }
       } catch (IOException e1) {
         logger.log(Level.SEVERE, "Error answer not sand", e1);
       }
     }
+  }
+
+  private void setTimeToAnswer(Answer answer, long startExecTime, long endExecSqlTime){
+    answer.setDateSend(command.getDateSend());
+    answer.setTimeOfReceiptServer(command.getDateRecipient()-command.getDateSend());
+    answer.setTimeOfExecSql(endExecSqlTime);
+    answer.setTimeOfExecuteServer(System.currentTimeMillis() - startExecTime);
+    answer.setDateAnswer(System.currentTimeMillis());
   }
 
   private QueueDao getQueueDao(){

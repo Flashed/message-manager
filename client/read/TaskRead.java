@@ -83,11 +83,9 @@ public class TaskRead implements Runnable{
 
   private SuccessAnswer parseSuccessAnswer(String data){
     try{
-
-      String mes = data.substring(data.indexOf("<mes>") + 5);
-      mes = mes.substring(0, mes.indexOf("</mes>"));
-
-      return new SuccessAnswer(mes);
+      SuccessAnswer answer = new SuccessAnswer();
+      parseCommonFields(answer, data);
+      return answer;
 
     }catch (Exception e){
       logger.log(Level.SEVERE, "Error parse CreateQueueCommand" , e);
@@ -97,16 +95,36 @@ public class TaskRead implements Runnable{
 
   private ErrorAnswer parseErrorAnswer(String data){
     try{
-
-      String mes = data.substring(data.indexOf("<mes>") + 5);
-      mes = mes.substring(0, mes.indexOf("</mes>"));
-
-      return new ErrorAnswer(mes);
-
+      ErrorAnswer answer = new ErrorAnswer();
+      parseCommonFields(answer, data);
+      return answer;
     }catch (Exception e){
       logger.log(Level.SEVERE, "Error parse CreateQueueCommand" , e);
     }
     return null;
+  }
+
+  private void parseCommonFields(Answer answer, String data){
+    String mes = data.substring(data.indexOf("<mes>") + 5);
+    mes = mes.substring(0, mes.indexOf("</mes>"));
+    String dateSend = data.substring(data.indexOf("<dateSend>") + 10);
+    dateSend = dateSend.substring(0, dateSend.indexOf("</dateSend>"));
+    String timeOfReceiptServer = data.substring(data.indexOf("<timeOfReceiptServer>") + 21);
+    timeOfReceiptServer = timeOfReceiptServer.substring(0, timeOfReceiptServer.indexOf("</timeOfReceiptServer>"));
+    String timeOfExecSql = data.substring(data.indexOf("<timeOfExecSql>") + 15);
+    timeOfExecSql = timeOfExecSql.substring(0, timeOfExecSql.indexOf("</timeOfExecSql>"));
+    String timeOfExecuteServer = data.substring(data.indexOf("<timeOfExecuteServer>") + 21);
+    timeOfExecuteServer = timeOfExecuteServer.substring(0, timeOfExecuteServer.indexOf("</timeOfExecuteServer>"));
+    String dateAnswer = data.substring(data.indexOf("<dateAnswer>") + 12);
+    dateAnswer = dateAnswer.substring(0, dateAnswer.indexOf("</dateAnswer>"));
+
+    answer.setMessage(mes);
+    answer.setDateSend(Long.valueOf(dateSend));
+    answer.setTimeOfReceiptServer(Long.valueOf(timeOfReceiptServer));
+    answer.setTimeOfExecSql(Long.valueOf(timeOfExecSql));
+    answer.setTimeOfExecuteServer(Long.valueOf(timeOfExecuteServer));
+    answer.setDateAnswer(Long.valueOf(dateAnswer));
+
   }
 
   private void writeToCharBuffer(){

@@ -35,6 +35,7 @@ public class ParseTask implements Runnable {
         writeToCharBuffer(buffer);
         if(checkBuffer(buffer)){
           Command command = parseCommand(buffer);
+          command.setDateRecipient(System.currentTimeMillis());
           if(command instanceof CreateQueueCommand){
             getExecutor().execute(new CreateQueueTask((CreateQueueCommand) command, clientChanel));
           } else if(command instanceof  QueueListCommand){
@@ -81,11 +82,14 @@ public class ParseTask implements Runnable {
       clientId = clientId.substring(0, clientId.indexOf("</clientId>"));
       String queueId = data.substring(data.indexOf("<queueId>") + 9);
       queueId = queueId.substring(0, queueId.indexOf("</queueId>"));
+      String dateSend = data.substring(data.indexOf("<dateSend>") + 10);
+      dateSend = dateSend.substring(0, dateSend.indexOf("</dateSend>"));
 
       CreateQueueCommand command = new CreateQueueCommand();
       command.setType(Command.CREATE_QUEUE);
       command.setClientId(Integer.valueOf(clientId));
       command.setQueueId(Integer.valueOf(queueId));
+      command.setDateSend(Long.valueOf(dateSend));
 
       return command;
 

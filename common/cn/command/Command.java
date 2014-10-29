@@ -11,11 +11,31 @@ public abstract class Command {
 
   private String type;
 
+  private long dateSend;
+
+  private long dateRecipient;
+
   public String getType() {
     return type;
   }
 
   public void setType(String type) {
     this.type = type;
+  }
+
+  public long getDateSend() {
+    return dateSend;
+  }
+
+  public void setDateSend(long dateSend) {
+    this.dateSend = dateSend;
+  }
+
+  public long getDateRecipient() {
+    return dateRecipient;
+  }
+
+  public void setDateRecipient(long dateRecipient) {
+    this.dateRecipient = dateRecipient;
   }
 }

@@ -47,6 +47,7 @@ public class CreateQueueExecutor implements CommandSetExecutor{
   private CreateQueueCommand createCreateQueueCommand(){
     CreateQueueCommand cmd = new CreateQueueCommand();
     cmd.setQueueId((int)(Math.random()*100000));
+    cmd.setDateSend(System.currentTimeMillis());
     return cmd;
   }
 }

@@ -12,7 +12,7 @@ public class StatisticService {
   private static final Logger logger = Logger.getLogger(StatisticService.class.getName());
 
   public void write(Answer answer){
-    logger.info("Write statistic");
+    logger.info("Write statistic " + answer);
   }
 
 }
