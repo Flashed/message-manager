@@ -59,6 +59,7 @@
         <copyfile src="resources/server/config.properties"  dest="build/server/config/config.properties" />
         <copyfile src="resources/server/logging.properties"  dest="build/server/config/logging.properties" />
         <copyfile src="resources/server/run.sh"  dest="build/server/run.sh" />
+        <copyfile src="resources/server/run.bat"  dest="build/server/run.bat" />
         <delete dir="build/server/classes" />
     </target>
     <!--<<<<server-->
@@ -100,6 +101,7 @@
         <copyfile src="resources/client/inputCommands.txt"  dest="build/client/config/inputCommands.txt" />
         <copyfile src="resources/client/logging.properties"  dest="build/client/config/logging.properties" />
         <copyfile src="resources/client/run.sh"  dest="build/client/run.sh" />
+        <copyfile src="resources/client/run.bat"  dest="build/client/run.bat" />
         <delete dir="build/client/classes" />
     </target>
     <!--<<<<<<<<<Client-->
