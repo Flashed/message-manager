@@ -20,7 +20,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
- * @author Mikhail Zaitsev
+ * A server class
  */
 public class Server {
 

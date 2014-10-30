@@ -3,10 +3,10 @@ package sr.task;
 import cn.answer.Answer;
 import cn.answer.ErrorAnswer;
 import cn.answer.SuccessAnswer;
-import cn.command.CreateQueueCommand;
+import cn.command.RegisterClientCommand;
+import cn.model.Client;
 import sr.context.AppContext;
-import sr.dao.QueueDao;
-import cn.model.Queue;
+import sr.dao.ClientDao;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -15,50 +15,48 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Task - create queue
+ * Task - register client
  */
-public class CreateQueueTask implements Runnable{
+public class RegisterClientTask implements Runnable {
 
-  private static final Logger logger = Logger.getLogger(CreateQueueTask.class.getName());
-
-  private CreateQueueCommand command;
+  private static final Logger logger = Logger.getLogger(RegisterClientTask.class.getName());
 
   private final SocketChannel clientChannel;
 
-  public CreateQueueTask(CreateQueueCommand command, SocketChannel clientChannel) {
-    this.command = command;
+  private RegisterClientCommand command;
+
+  public RegisterClientTask(RegisterClientCommand command, SocketChannel clientChannel) {
     this.clientChannel = clientChannel;
+    this.command = command;
   }
 
   @Override
   public void run() {
-
     long startExecTime = System.currentTimeMillis();
     try{
-     Queue queue = new Queue();
-      queue.setId(command.getQueueId());
+      ClientDao dao = getDao();
+      Client client = new Client();
+      client.setId(command.getClientId());
 
-      QueueDao dao = getQueueDao();
+      long startExecSql = System.currentTimeMillis();
+      try{
+        dao.save(client);
+      } catch (Exception ignore){}
+      long endExecSqlTime = System.currentTimeMillis() - startExecSql;
 
-      long startExecSqlTime = System.currentTimeMillis();
-      dao.save(queue);
-      long endExecSqlTime = System.currentTimeMillis() - startExecSqlTime;
-
-      logger.info("Created: "+ queue);
+      logger.info("Created: "+ client);
 
       synchronized (clientChannel){
-        SuccessAnswer answer = new SuccessAnswer("The queue created");
+        SuccessAnswer answer = new SuccessAnswer("The client registered");
         Answer.setTimeToAnswer(command, answer, startExecTime, endExecSqlTime);
         clientChannel.write(ByteBuffer.wrap(
                 answer.toString().getBytes()));
-
       }
     } catch (Exception e){
-      logger.log(Level.SEVERE, "Error create Queue Task", e);
-
+      logger.log(Level.SEVERE,"Failed to register client");
       try {
         synchronized (clientChannel){
-          ErrorAnswer answer = new ErrorAnswer("The queue not created");
+          ErrorAnswer answer = new ErrorAnswer("The client not registered");
           Answer.setTimeToAnswer(command, answer, startExecTime, 0);
           clientChannel.write(ByteBuffer.wrap(
                   answer.toString().getBytes()));
@@ -66,12 +64,12 @@ public class CreateQueueTask implements Runnable{
       } catch (IOException e1) {
         logger.log(Level.SEVERE, "Error answer not sand", e1);
       }
+
     }
+
   }
 
-  private QueueDao getQueueDao(){
-    return AppContext.getAppContext().getQueueDao();
+  private ClientDao getDao(){
+    return AppContext.getAppContext().getClientDao();
   }
-
-
 }

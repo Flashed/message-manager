@@ -3,6 +3,7 @@ package sr.task;
 import cn.command.Command;
 import cn.command.CreateQueueCommand;
 import cn.command.QueueListCommand;
+import cn.command.RegisterClientCommand;
 import sr.context.AppContext;
 
 import java.nio.ByteBuffer;
@@ -11,9 +12,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author Mikhail Zaitsev
- */
+
 public class ParseTask implements Runnable {
 
   private static final Logger logger = Logger.getLogger(ParseTask.class.getName());
@@ -33,15 +32,19 @@ public class ParseTask implements Runnable {
       StringBuilder buffer = getBuffer();
       synchronized (buffer){
         writeToCharBuffer(buffer);
-        if(checkBuffer(buffer)){
+        while (checkBuffer(buffer)){
           Command command = parseCommand(buffer);
+          if(command == null){
+            return;
+          }
           command.setDateRecipient(System.currentTimeMillis());
           if(command instanceof CreateQueueCommand){
             getExecutor().execute(new CreateQueueTask((CreateQueueCommand) command, clientChanel));
           } else if(command instanceof  QueueListCommand){
             getExecutor().execute(new GetQueueListTask(clientChanel));
+          } else if(command instanceof RegisterClientCommand){
+            getExecutor().execute(new RegisterClientTask((RegisterClientCommand) command, clientChanel));
           }
-          buffer.setLength(0);
         }
       }
     } catch (Exception e) {
@@ -61,35 +64,49 @@ public class ParseTask implements Runnable {
 
   private Command parseCommand(StringBuilder buffer){
     String data = buffer.toString();
-    data = data.substring(data.indexOf("<cmd>") + 5);
-    data = data.substring(0, data.indexOf("</cmd>"));
+    int start = data.indexOf("<cmd>");
+    int end = data.indexOf("</cmd>");
+    data = data.substring(start + 5);
+    data = data.substring(0, end);
     String type = data.substring(data.indexOf("<type>") + 6);
     type = type.substring(0, type.indexOf("</type>"));
 
+    end = end + 6;
     if(Command.CREATE_QUEUE.equals(type)){
+      buffer.delete(start, end);
       return parseCreateQueueCommand(data);
     } else if (Command.QUEUE_LIST.equals(type)){
+      buffer.delete(start, end);
       return new QueueListCommand();
+    } else if (Command.REGISTER_CLIENT.equals(type)){
+      buffer.delete(start, end);
+      return parseRegisterClientCommand(data);
     }
+    return null;
+  }
 
+  private RegisterClientCommand parseRegisterClientCommand(String data){
+    try{
+      RegisterClientCommand command = new RegisterClientCommand();
+      parseCommonFields(command, data);
+      return command;
+    } catch (Exception e){
+      logger.log(Level.SEVERE, "Error parse RegisterClientCommand" , e);
+    }
     return null;
   }
 
   private CreateQueueCommand parseCreateQueueCommand(String data){
     try{
 
-      String clientId = data.substring(data.indexOf("<clientId>") + 10);
-      clientId = clientId.substring(0, clientId.indexOf("</clientId>"));
       String queueId = data.substring(data.indexOf("<queueId>") + 9);
       queueId = queueId.substring(0, queueId.indexOf("</queueId>"));
-      String dateSend = data.substring(data.indexOf("<dateSend>") + 10);
-      dateSend = dateSend.substring(0, dateSend.indexOf("</dateSend>"));
 
       CreateQueueCommand command = new CreateQueueCommand();
       command.setType(Command.CREATE_QUEUE);
-      command.setClientId(Integer.valueOf(clientId));
       command.setQueueId(Integer.valueOf(queueId));
-      command.setDateSend(Long.valueOf(dateSend));
+
+      parseCommonFields(command, data);
 
       return command;
 
@@ -97,6 +114,16 @@ public class ParseTask implements Runnable {
       logger.log(Level.SEVERE, "Error parse CreateQueueCommand" , e);
     }
     return null;
+  }
+
+  private void parseCommonFields(Command command, String data){
+    String clientId = data.substring(data.indexOf("<clientId>") + 10);
+    clientId = clientId.substring(0, clientId.indexOf("</clientId>"));
+    String dateSend = data.substring(data.indexOf("<dateSend>") + 10);
+    dateSend = dateSend.substring(0, dateSend.indexOf("</dateSend>"));
+
+    command.setClientId(Integer.valueOf(clientId));
+    command.setDateSend(Long.valueOf(dateSend));
   }
 
   private void writeToCharBuffer(StringBuilder buffer){

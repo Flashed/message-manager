@@ -51,13 +51,12 @@ public class AppContext {
     poolingDataSource.setMaxConnections(Config.getDBConnectionsNumber());
 
     clientDao = new ClientDaoImpl();
+    queueDao = new QueueDaoImpl();
 
     poolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Config.getNumberThread());
 
     server = new Server(Config.getPort());
     server.setPoolExecutor(poolExecutor);
-
-    queueDao = new QueueDaoImpl();
 
   }
 

@@ -5,20 +5,10 @@ package cn.command;
  */
 public class CreateQueueCommand extends Command{
 
-  private int clientId;
-
   private int queueId;
 
   public CreateQueueCommand() {
     setType(CREATE_QUEUE);
-  }
-
-  public int getClientId() {
-    return clientId;
-  }
-
-  public void setClientId(int clientId) {
-    this.clientId = clientId;
   }
 
   public int getQueueId() {

@@ -1,7 +1,7 @@
 package cn.command;
 
 /**
- * @author Mikhail Zaitsev
+ * A command - get list of queue
  */
 public class QueueListCommand extends Command{
 

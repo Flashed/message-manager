@@ -3,6 +3,9 @@ import cmdset.CommandSetStarter;
 import cmdset.CommandSetStarterListener;
 import cmdset.executor.CommandSetExecutor;
 import cmdset.executor.CreateQueueExecutor;
+import cmdset.executor.RegisterClientExecutor;
+import cn.answer.Answer;
+import read.ReadListener;
 import read.TaskRead;
 import statistic.StatisticService;
 
@@ -18,7 +21,7 @@ import java.util.logging.Logger;
 /**
  * @author Mikhail Zaitsev
  */
-public class Client implements CommandSetStarterListener {
+public class Client implements CommandSetStarterListener, ReadListener {
 
   private static final Logger logger = Logger.getLogger(Client.class.getName());
 
@@ -31,6 +34,7 @@ public class Client implements CommandSetStarterListener {
   private SocketChannel socketChannel;
 
   private Map<String, CommandSetExecutor> setExecutorsMap = new HashMap<>();
+  private Map<Long, CommandSetExecutor> handlesTimesExecutorsMap = new HashMap<>();
 
   private TaskRead taskRead;
 
@@ -50,6 +54,7 @@ public class Client implements CommandSetStarterListener {
     try {
       socketChannel = SocketChannel.open(new InetSocketAddress(host, port));
       taskRead = new TaskRead(socketChannel);
+      taskRead.setReadListener(this);
       new Thread(taskRead).start();
       logger.info(String.format("Connected to %s:%s",host, port));
       startExecutor();
@@ -64,7 +69,12 @@ public class Client implements CommandSetStarterListener {
     statisticService.setClientId(clientId);
 
     CreateQueueExecutor createQueueExecutor = new CreateQueueExecutor(socketChannel, statisticService);
-    setExecutorsMap.put(CommandSet.TYPE_CREATE_QUEUES,createQueueExecutor);
+    createQueueExecutor.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
+    setExecutorsMap.put(CommandSet.TYPE_CREATE_QUEUE,createQueueExecutor);
+
+    RegisterClientExecutor registerClientExecutor = new RegisterClientExecutor(socketChannel, statisticService, clientId);
+    registerClientExecutor.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
+    setExecutorsMap.put(CommandSet.TYPE_REGISTER_CLIENT,registerClientExecutor);
 
     CommandSetStarter commandGenerator = new CommandSetStarter(timeoutExec, this);
     commandGenerator.start();
@@ -78,8 +88,15 @@ public class Client implements CommandSetStarterListener {
     }
     if(setExecutorsMap.containsKey(commandSet.getType())){
       CommandSetExecutor executor = setExecutorsMap.get(commandSet.getType());
-      taskRead.setReadListener(executor);
       executor.execute(commandSet);
+    }
+
+  }
+
+  @Override
+  public void onReadAnswer(Answer answer) {
+    if(handlesTimesExecutorsMap.containsKey(answer.getDateSend())){
+      handlesTimesExecutorsMap.remove(answer.getDateSend()).handleAnswer(answer);
     }
 
   }
@@ -100,5 +117,4 @@ public class Client implements CommandSetStarterListener {
             Config.getClientId());
     client.connect();
   }
-
 }

@@ -71,9 +71,7 @@ public class CommandSetStarter {
       for(CommandSet cmdExec: cmdExecList){
         for(int i=0; i<cmdExec.getExecCount(); i++){
           if(listener != null){
-            if(CommandSet.TYPE_CREATE_QUEUES.equals(cmdExec.getType())){
-              listener.onGetCommandSet(cmdExec);
-            }
+            listener.onGetCommandSet(cmdExec);
             logger.info(String.format("Execute  %s iteration %s", cmdExec.getType(), i+1));
             try {
               Thread.sleep(timeoutExec);

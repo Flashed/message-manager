@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author Mikhail Zaitsev
- */
 public class QueueDaoImpl implements QueueDao{
 
   private static final Logger logger = Logger.getLogger(QueueDaoImpl.class.getName());

@@ -7,9 +7,12 @@ public abstract class Command {
 
   public static final String CREATE_QUEUE = "create_queue";
   public static final String QUEUE_LIST = "queue_list";
+  public static final String REGISTER_CLIENT = "register_client";
 
 
   private String type;
+
+  private int clientId;
 
   private long dateSend;
 
@@ -33,6 +36,14 @@ public abstract class Command {
 
   public long getDateRecipient() {
     return dateRecipient;
+  }
+
+  public int getClientId() {
+    return clientId;
+  }
+
+  public void setClientId(int clientId) {
+    this.clientId = clientId;
   }
 
   public void setDateRecipient(long dateRecipient) {

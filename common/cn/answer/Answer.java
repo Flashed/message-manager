@@ -1,5 +1,7 @@
 package cn.answer;
 
+import cn.command.Command;
+
 public class Answer {
 
   public static final String SUCCESS = "success";
@@ -75,5 +77,13 @@ public class Answer {
 
   public void setDateAnswer(long dateAnswer) {
     this.dateAnswer = dateAnswer;
+  }
+
+  public static void setTimeToAnswer(Command command, Answer answer, long startExecTime, long endExecSqlTime){
+    answer.setDateSend(command.getDateSend());
+    answer.setTimeOfReceiptServer(command.getDateRecipient()-command.getDateSend());
+    answer.setTimeOfExecSql(endExecSqlTime);
+    answer.setTimeOfExecuteServer(System.currentTimeMillis() - startExecTime);
+    answer.setDateAnswer(System.currentTimeMillis());
   }
 }

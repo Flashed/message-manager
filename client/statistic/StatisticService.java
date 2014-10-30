@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * @author Mikhail Zaitsev
+ * A Statistic service
  */
 public class StatisticService {
 
