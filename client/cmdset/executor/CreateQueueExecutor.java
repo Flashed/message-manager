@@ -39,13 +39,9 @@ public class CreateQueueExecutor implements CommandSetExecutor{
   @Override
   public void execute(CommandSet commandSet) {
     try{
-      ByteBuffer buffer = ByteBuffer.allocate(1024);
       Command command = createCreateQueueCommand();
       handlesTimesExecutorsMap.put(command.getDateSend(), this);
-      buffer.put(command.toString().getBytes());
-      buffer.flip();
-      socketChannel.write(buffer);
-      buffer.clear();
+      socketChannel.write(ByteBuffer.wrap(command.toString().getBytes()));
     }catch (Exception e){
       logger.log(Level.SEVERE, "Error send command ", e);
     }

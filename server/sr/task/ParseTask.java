@@ -1,9 +1,6 @@
 package sr.task;
 
-import cn.command.Command;
-import cn.command.CreateQueueCommand;
-import cn.command.QueueListCommand;
-import cn.command.RegisterClientCommand;
+import cn.command.*;
 import sr.context.AppContext;
 
 import java.nio.ByteBuffer;
@@ -31,7 +28,6 @@ public class ParseTask implements Runnable {
     try {
       StringBuilder buffer = getBuffer();
       synchronized (buffer){
-        writeToCharBuffer(buffer);
         while (checkBuffer(buffer)){
           Command command = parseCommand(buffer);
           if(command == null){
@@ -41,9 +37,11 @@ public class ParseTask implements Runnable {
           if(command instanceof CreateQueueCommand){
             getExecutor().execute(new CreateQueueTask((CreateQueueCommand) command, clientChanel));
           } else if(command instanceof  QueueListCommand){
-            getExecutor().execute(new GetQueueListTask(clientChanel));
+            getExecutor().execute(new GetQueueListTask((QueueListCommand) command, clientChanel));
           } else if(command instanceof RegisterClientCommand){
             getExecutor().execute(new RegisterClientTask((RegisterClientCommand) command, clientChanel));
+          } else if(command instanceof  SendMessageCommand){
+            getExecutor().execute(new SendMessageTask((SendMessageCommand) command, clientChanel));
           }
         }
       }
@@ -66,21 +64,35 @@ public class ParseTask implements Runnable {
     String data = buffer.toString();
     int start = data.indexOf("<cmd>");
     int end = data.indexOf("</cmd>");
-    data = data.substring(start + 5);
-    data = data.substring(0, end);
-    String type = data.substring(data.indexOf("<type>") + 6);
+    String cmd = data.substring(start + 5);
+    cmd = cmd.substring(0, cmd.indexOf("</cmd>"));
+    String type = cmd.substring(cmd.indexOf("<type>") + 6);
     type = type.substring(0, type.indexOf("</type>"));
 
     end = end + 6;
     if(Command.CREATE_QUEUE.equals(type)){
       buffer.delete(start, end);
-      return parseCreateQueueCommand(data);
+      return parseCreateQueueCommand(cmd);
     } else if (Command.QUEUE_LIST.equals(type)){
       buffer.delete(start, end);
-      return new QueueListCommand();
+      return parseQueueListCommand(cmd);
     } else if (Command.REGISTER_CLIENT.equals(type)){
       buffer.delete(start, end);
-      return parseRegisterClientCommand(data);
+      return parseRegisterClientCommand(cmd);
+    } else if (Command.SEND_MESSAGE.equals(type)){
+      buffer.delete(start, end);
+      return parseSendMessageCommand(cmd);
+    }
+    return null;
+  }
+
+  private QueueListCommand parseQueueListCommand(String data){
+    try{
+      QueueListCommand command = new QueueListCommand();
+      parseCommonFields(command, data);
+      return command;
+    } catch (Exception e){
+      logger.log(Level.SEVERE, "Error parse QueueListCommand" , e);
     }
     return null;
   }
@@ -116,6 +128,32 @@ public class ParseTask implements Runnable {
     return null;
   }
 
+  private SendMessageCommand parseSendMessageCommand(String data){
+    try{
+
+      String queueId = data.substring(data.indexOf("<queueId>") + 9);
+      queueId = queueId.substring(0, queueId.indexOf("</queueId>"));
+      String recipientId = data.substring(data.indexOf("<recipientId>") + 13);
+      recipientId = recipientId.substring(0, recipientId.indexOf("</recipientId>"));
+      String text = data.substring(data.indexOf("<text>") + 6);
+      text = text.substring(0, text.indexOf("</text>"));
+
+
+      SendMessageCommand  command = new SendMessageCommand();
+      command.setQueueId(Integer.valueOf(queueId));
+      command.setRecipientId(Integer.valueOf(recipientId));
+      command.setText(text);
+
+      parseCommonFields(command, data);
+
+      return command;
+
+    }catch (Exception e){
+      logger.log(Level.SEVERE, "Error parse CreateQueueCommand" , e);
+    }
+    return null;
+  }
+
   private void parseCommonFields(Command command, String data){
     String clientId = data.substring(data.indexOf("<clientId>") + 10);
     clientId = clientId.substring(0, clientId.indexOf("</clientId>"));
@@ -124,20 +162,6 @@ public class ParseTask implements Runnable {
 
     command.setClientId(Integer.valueOf(clientId));
     command.setDateSend(Long.valueOf(dateSend));
-  }
-
-  private void writeToCharBuffer(StringBuilder buffer){
-    readBuffer.flip();
-    byte[] bytes = readBuffer.array();
-    for(int i = readBuffer.position(); i<readBuffer.limit(); i++){
-      if(buffer.length() > (5*1024)){
-        logger.warning("The cn.command > 5KB for " + clientChanel);
-        buffer.setLength(0);
-        break;
-      }
-      buffer.append((char)bytes[i]);
-    }
-    readBuffer.clear();
   }
 
   private StringBuilder getBuffer(){

@@ -36,8 +36,14 @@ public class QueueListAnswer extends Answer{
     }
 
     return "<ans>\n" +
-            "    <type>"+getType()+"</type>\n" +
+            "    <type>"+ getType() +"</type>\n" +
             "    <mes>"+getMessage()+"</mes>\n" +
+            "    <dateSend>"+getDateSend()+"</dateSend>\n" +
+            "    <timeOfReceiptServer>"+getTimeOfReceiptServer()+"</timeOfReceiptServer>\n" +
+            "    <timeOfExecSql>"+getTimeOfExecSql()+"</timeOfExecSql>\n" +
+            "    <timeOfExecuteServer>"+getTimeOfExecuteServer()+"</timeOfExecuteServer>\n" +
+            "    <dateAnswer>"+getDateAnswer()+"</dateAnswer>\n" +
+            "    <dateAnswer>"+getDateAnswer()+"</dateAnswer>\n" +
             "    <ids>\n" +
             "" + data.toString() + "\n" +
             "    </ids>\n" +

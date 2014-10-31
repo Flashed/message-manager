@@ -1,7 +1,9 @@
 package sr.task;
 
+import cn.answer.Answer;
 import cn.answer.ErrorAnswer;
 import cn.answer.QueueListAnswer;
+import cn.command.QueueListCommand;
 import sr.context.AppContext;
 import sr.dao.QueueDao;
 import cn.model.Queue;
@@ -19,25 +21,37 @@ public class GetQueueListTask implements Runnable{
 
   private final SocketChannel clientChannel;
 
-  public GetQueueListTask(SocketChannel clientChannel) {
+  private QueueListCommand command;
+
+  public GetQueueListTask(QueueListCommand command ,SocketChannel clientChannel) {
     this.clientChannel = clientChannel;
+    this.command = command;
   }
 
   @Override
   public void run() {
+
+    long startExecTime = System.currentTimeMillis();
     try{
       List<Queue> queues = getQueueDao().getAll();
+      long endExecSqlTime = System.currentTimeMillis() - startExecTime;
       synchronized (clientChannel){
+        QueueListAnswer queueListAnswer = new QueueListAnswer(queues);
+        Answer.setTimeToAnswer(command, queueListAnswer, startExecTime, endExecSqlTime);
         clientChannel.write(ByteBuffer.wrap(
-                new QueueListAnswer(queues).toString()
-                        .getBytes()));
+                queueListAnswer.toString()
+                        .getBytes()
+        ));
+        logger.info("Send list of queues");
       }
     } catch (Exception e){
       logger.log(Level.SEVERE, "Error get list of queues", e);
       try {
         synchronized (clientChannel) {
+          ErrorAnswer answer = new ErrorAnswer("Error get list of queues");
+          Answer.setTimeToAnswer(command, answer, startExecTime, 0);
           clientChannel.write(ByteBuffer.wrap(
-                  new ErrorAnswer("Error get list of queues").toString().getBytes()));
+                  new ErrorAnswer().toString().getBytes()));
         }
       } catch (IOException e1) {
         logger.log(Level.SEVERE, "Error answer not sand", e1);

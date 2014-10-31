@@ -132,7 +132,34 @@ public class Server {
       return;
     }
 
+
+    StringBuilder buffer = getBuffer(socketChannel);
+    synchronized (buffer){
+      writeToCharBuffer(buffer, readBuffer);
+    }
     poolExecutor.execute(new ParseTask(readBuffer, socketChannel));
+  }
+
+  private StringBuilder getBuffer(SocketChannel clientChanel){
+    synchronized (AppContext.getAppContext().getCommandBuffers()){
+      if(!AppContext.getAppContext().getCommandBuffers().containsKey(clientChanel)){
+        AppContext.getAppContext().getCommandBuffers().put(clientChanel, new StringBuilder());
+      }
+      return AppContext.getAppContext().getCommandBuffers().get(clientChanel);
+    }
+  }
+
+  private void writeToCharBuffer(StringBuilder buffer, ByteBuffer byteBuffer){
+    byteBuffer.flip();
+    byte[] bytes = byteBuffer.array();
+    for(int i = byteBuffer.position(); i<byteBuffer.limit(); i++){
+      if(buffer.length() > (100*1000*1024)){
+        buffer.setLength(0);
+        break;
+      }
+      buffer.append((char)bytes[i]);
+    }
+    byteBuffer.clear();
   }
 
   public void stop(){

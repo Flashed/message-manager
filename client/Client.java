@@ -1,10 +1,9 @@
 import cmdset.CommandSet;
 import cmdset.CommandSetStarter;
 import cmdset.CommandSetStarterListener;
-import cmdset.executor.CommandSetExecutor;
-import cmdset.executor.CreateQueueExecutor;
-import cmdset.executor.RegisterClientExecutor;
+import cmdset.executor.*;
 import cn.answer.Answer;
+import cn.command.SendMessageCommand;
 import read.ReadListener;
 import read.TaskRead;
 import statistic.StatisticService;
@@ -75,6 +74,38 @@ public class Client implements CommandSetStarterListener, ReadListener {
     RegisterClientExecutor registerClientExecutor = new RegisterClientExecutor(socketChannel, statisticService, clientId);
     registerClientExecutor.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
     setExecutorsMap.put(CommandSet.TYPE_REGISTER_CLIENT,registerClientExecutor);
+
+    SendBroadcastExecutor sendBroadcastExecutor = new SendBroadcastExecutor(CommandSet.TYPE_SEND_SMALL_BROADCAST_TO_ONE,
+            socketChannel, statisticService,
+            SendBroadcastExecutor.CountQueuesMode.MODE_ONE,
+            SendBroadcastExecutor.SizeMessageMode.MODE_SMALL,
+            clientId);
+    sendBroadcastExecutor.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
+    setExecutorsMap.put(CommandSet.TYPE_SEND_SMALL_BROADCAST_TO_ONE,sendBroadcastExecutor);
+
+    SendBroadcastExecutor sendBroadcastExecutor2 = new SendBroadcastExecutor(CommandSet.TYPE_SEND_SMALL_BROADCAST_TO_SEVERAL,
+            socketChannel, statisticService,
+            SendBroadcastExecutor.CountQueuesMode.MODE_SEVERAL,
+            SendBroadcastExecutor.SizeMessageMode.MODE_SMALL,
+            clientId);
+    sendBroadcastExecutor2.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
+    setExecutorsMap.put(CommandSet.TYPE_SEND_SMALL_BROADCAST_TO_SEVERAL, sendBroadcastExecutor2);
+
+    SendBroadcastExecutor sendBroadcastExecutor3 = new SendBroadcastExecutor(CommandSet.TYPE_SEND_BIG_BROADCAST_TO_ONE,
+            socketChannel, statisticService,
+            SendBroadcastExecutor.CountQueuesMode.MODE_ONE,
+            SendBroadcastExecutor.SizeMessageMode.MODE_BIG,
+            clientId);
+    sendBroadcastExecutor3.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
+    setExecutorsMap.put(CommandSet.TYPE_SEND_BIG_BROADCAST_TO_ONE, sendBroadcastExecutor3);
+
+    SendBroadcastExecutor sendBroadcastExecutor4 = new SendBroadcastExecutor(CommandSet.TYPE_SEND_BIG_BROADCAST_TO_SEVERAL,
+            socketChannel, statisticService,
+            SendBroadcastExecutor.CountQueuesMode.MODE_SEVERAL,
+            SendBroadcastExecutor.SizeMessageMode.MODE_BIG,
+            clientId);
+    sendBroadcastExecutor4.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
+    setExecutorsMap.put(CommandSet.TYPE_SEND_BIG_BROADCAST_TO_SEVERAL,sendBroadcastExecutor4);
 
     CommandSetStarter commandGenerator = new CommandSetStarter(timeoutExec, this);
     commandGenerator.start();

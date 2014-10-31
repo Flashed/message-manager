@@ -8,6 +8,9 @@ public class CommandSet {
   public static final String TYPE_CREATE_QUEUE = "create_queue";
   public static final String TYPE_REGISTER_CLIENT = "register_client";
   public static final String TYPE_SEND_SMALL_BROADCAST_TO_ONE = "send_small_broadcast_to_one";
+  public static final String TYPE_SEND_SMALL_BROADCAST_TO_SEVERAL = "send_small_broadcast_to_several";
+  public static final String TYPE_SEND_BIG_BROADCAST_TO_ONE = "send_big_broadcast_to_one";
+  public static final String TYPE_SEND_BIG_BROADCAST_TO_SEVERAL = "send_big_broadcast_to_several";
 
   private String type;
 

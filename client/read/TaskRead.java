@@ -2,10 +2,14 @@ package read;
 
 import cn.answer.Answer;
 import cn.answer.ErrorAnswer;
+import cn.answer.QueueListAnswer;
 import cn.answer.SuccessAnswer;
+import cn.model.Queue;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,18 +44,21 @@ public class TaskRead implements Runnable{
       int num;
       while((num = socketChannel.read(readBuffer)) != -1){
         writeToCharBuffer();
-        if(checkBuffer()){
+        while(checkBuffer()){
           if(readListener != null){
-            Answer answer = parseAnswer();
-            readListener.onReadAnswer(answer);
+            try{
+              Answer answer = parseAnswer();
+              readListener.onReadAnswer(answer);
+            } catch (Exception e){
+              logger.log(Level.SEVERE, "Failed to read answer \n " + new String(readBuffer.array()) , e);
+            }
           }
           readBuffer.clear();
-          charBuffer.setLength(0);
         }
       }
       socketChannel.close();
     } catch (Exception e){
-      e.printStackTrace();
+      logger.log(Level.SEVERE, "Reading was stop" , e);
     }
   }
 
@@ -67,19 +74,56 @@ public class TaskRead implements Runnable{
 
   private Answer parseAnswer(){
     String data = charBuffer.toString();
-    data = data.substring(data.indexOf("<ans>") + 5);
-    data = data.substring(0, data.indexOf("</ans>"));
-    String type = data.substring(data.indexOf("<type>") + 6);
+    int start = data.indexOf("<ans>");
+    int end = data.indexOf("</ans>");
+    String answer = data.substring(start + 5);
+    answer = answer.substring(0, answer.indexOf("</ans>"));
+    String type = answer.substring(answer.indexOf("<type>") + 6);
     type = type.substring(0, type.indexOf("</type>"));
 
     if(Answer.SUCCESS.equals(type)){
-      return parseSuccessAnswer(data);
+      charBuffer.delete(start, end+6);
+      return parseSuccessAnswer(answer);
     } else if (Answer.ERROR.equals(type)){
-      return parseErrorAnswer(data);
+      charBuffer.delete(start, end+6);
+      return parseErrorAnswer(answer);
+    } if(Answer.QUEUES_LIST.equals(type)){
+      charBuffer.delete(start, end+6);
+      return parseQueueListAnswer(answer);
     }
 
     return null;
   }
+
+  private QueueListAnswer parseQueueListAnswer(String data){
+    try{
+
+      String ids = data.substring(data.indexOf("<ids>") + 5);
+      ids = ids.substring(0, ids.indexOf("</ids>"));
+
+      List<Queue> queues = new ArrayList<>();
+
+      String id;
+      try {
+        while(true){
+          id= ids.substring(ids.indexOf("<id>") + 4, ids.indexOf("</id>"));
+          ids = ids.substring(ids.indexOf("</id>") + 5, ids.length() );
+          Queue queue = new Queue();
+          queue.setId(Integer.valueOf(id));
+          queues.add(queue);
+        }
+      } catch (IndexOutOfBoundsException ignore){}
+
+      QueueListAnswer answer = new QueueListAnswer(queues);
+      parseCommonFields(answer, data);
+      return answer;
+
+    }catch (Exception e){
+      logger.log(Level.SEVERE, "Error parse CreateQueueCommand" , e);
+    }
+    return null;
+  }
+
 
   private SuccessAnswer parseSuccessAnswer(String data){
     try{
@@ -131,7 +175,7 @@ public class TaskRead implements Runnable{
     readBuffer.flip();
     byte[] bytes = readBuffer.array();
     for(int i = readBuffer.position(); i<readBuffer.limit(); i++){
-      if(charBuffer.length() > (5*1024)){
+      if(charBuffer.length() > (100*1000*1024)){
         charBuffer.setLength(0);
         break;
       }

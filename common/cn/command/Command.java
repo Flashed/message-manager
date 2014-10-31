@@ -8,6 +8,7 @@ public abstract class Command {
   public static final String CREATE_QUEUE = "create_queue";
   public static final String QUEUE_LIST = "queue_list";
   public static final String REGISTER_CLIENT = "register_client";
+  public static final String SEND_MESSAGE = "send_message";
 
 
   private String type;

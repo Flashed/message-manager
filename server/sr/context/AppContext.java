@@ -2,11 +2,8 @@ package sr.context;
 
 import sr.Config;
 import sr.Server;
-import sr.dao.ClientDao;
+import sr.dao.*;
 import org.postgresql.jdbc2.optional.PoolingDataSource;
-import sr.dao.ClientDaoImpl;
-import sr.dao.QueueDao;
-import sr.dao.QueueDaoImpl;
 
 import java.nio.channels.Channel;
 import java.util.HashMap;
@@ -33,7 +30,11 @@ public class AppContext {
 
   private QueueDao queueDao;
 
+  private MessageDao messageDao;
+
   private Map<Channel, StringBuilder> commandBuffers = new HashMap();
+
+  private Integer messagesCount = -1;
 
   private AppContext() {
 
@@ -52,6 +53,7 @@ public class AppContext {
 
     clientDao = new ClientDaoImpl();
     queueDao = new QueueDaoImpl();
+    messageDao = new MessageDaoImpl();
 
     poolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Config.getNumberThread());
 
@@ -94,5 +96,18 @@ public class AppContext {
 
   public QueueDao getQueueDao() {
     return queueDao;
+  }
+
+  public MessageDao getMessageDao() {
+    return messageDao;
+  }
+
+  public Integer getMessagesCount() {
+    return messagesCount;
+  }
+
+  public void setMessagesCount(Integer messagesCount) {
+      this.messagesCount = messagesCount;
+
   }
 }

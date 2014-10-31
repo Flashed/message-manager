@@ -1,0 +1,8 @@
+<cmd>
+    <type>send_message</type>
+    <recipientId>1</recipientId>
+    <queueId>1</queueId>
+    <clientId>1</clientId>
+    <dateSend>123123123123</dateSend>
+    <text>text text text</text>
+</cmd>
