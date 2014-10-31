@@ -42,7 +42,7 @@ public class Config {
 
   public static int getClientId(){
     try{
-      return Integer.valueOf(getProp("client.id"));
+      return (int) (Math.random() *100000);
     } catch (Exception e){
       return -1;
     }
