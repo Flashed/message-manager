@@ -1,7 +1,6 @@
 package cn.command;
 
 /**
- * @author Mikhail Zaitsev
  */
 public class ClientListCommand extends Command{
   public ClientListCommand() {

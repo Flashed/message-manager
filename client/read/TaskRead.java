@@ -11,7 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * @author Mikhail Zaitsev
  */
 public class TaskRead implements Runnable{
 
