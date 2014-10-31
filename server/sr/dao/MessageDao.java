@@ -10,4 +10,7 @@ public interface MessageDao {
   void save(Message message);
 
   void delete(Message message);
+
+  Message get(int queueId, int receiverId);
+
 }

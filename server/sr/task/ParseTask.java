@@ -42,6 +42,8 @@ public class ParseTask implements Runnable {
             getExecutor().execute(new RegisterClientTask((RegisterClientCommand) command, clientChanel));
           } else if(command instanceof  SendMessageCommand){
             getExecutor().execute(new SendMessageTask((SendMessageCommand) command, clientChanel));
+          } else if(command instanceof  GetMeMessageCommand){
+            getExecutor().execute(new GetMessageTask((GetMeMessageCommand) command, clientChanel));
           }
         }
       }
@@ -82,6 +84,29 @@ public class ParseTask implements Runnable {
     } else if (Command.SEND_MESSAGE.equals(type)){
       buffer.delete(start, end);
       return parseSendMessageCommand(cmd);
+    }  else if (Command.GET_ME_MESSAGE.equals(type)){
+      buffer.delete(start, end);
+      return parseGetMeMessageCommand(cmd);
+    }
+    return null;
+  }
+
+  private GetMeMessageCommand parseGetMeMessageCommand(String data){
+    try{
+
+      String queueId = data.substring(data.indexOf("<queueId>") + 9);
+      queueId = queueId.substring(0, queueId.indexOf("</queueId>"));
+
+      GetMeMessageCommand command = new GetMeMessageCommand();
+      command.setType(Command.GET_ME_MESSAGE);
+      command.setQueueId(Integer.valueOf(queueId));
+
+      parseCommonFields(command, data);
+
+      return command;
+
+    }catch (Exception e){
+      logger.log(Level.SEVERE, "Error parse GetMeMessageCommand" , e);
     }
     return null;
   }
@@ -127,6 +152,8 @@ public class ParseTask implements Runnable {
     }
     return null;
   }
+
+
 
   private SendMessageCommand parseSendMessageCommand(String data){
     try{

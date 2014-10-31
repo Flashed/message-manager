@@ -1,17 +1,22 @@
 package cn.answer;
 
 /**
- * A success answer
+ * Answer - message
  */
-public class SuccessAnswer extends Answer{
+public class MessageAnswer extends Answer{
 
-  public SuccessAnswer(String message) {
-    setMessage(message);
-    setType(Answer.SUCCESS);
+  private String text;
+
+  public MessageAnswer() {
+    setType(MESSAGE);
   }
 
-  public SuccessAnswer() {
-    setType(Answer.SUCCESS);
+  public String getText() {
+    return text;
+  }
+
+  public void setText(String text) {
+    this.text = text;
   }
 
   @Override
@@ -20,11 +25,11 @@ public class SuccessAnswer extends Answer{
             "    <type>"+ getType() +"</type>\n" +
             "    <mes>"+getMessage()+"</mes>\n" +
             "    <dateSend>"+getDateSend()+"</dateSend>\n" +
+            "    <text>"+getText()+"</text>\n" +
             "    <timeOfReceiptServer>"+getTimeOfReceiptServer()+"</timeOfReceiptServer>\n" +
             "    <timeOfExecSql>"+getTimeOfExecSql()+"</timeOfExecSql>\n" +
             "    <timeOfExecuteServer>"+getTimeOfExecuteServer()+"</timeOfExecuteServer>\n" +
             "    <dateAnswer>"+getDateAnswer()+"</dateAnswer>\n" +
             "</ans>";
   }
-
 }

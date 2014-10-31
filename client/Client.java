@@ -3,7 +3,6 @@ import cmdset.CommandSetStarter;
 import cmdset.CommandSetStarterListener;
 import cmdset.executor.*;
 import cn.answer.Answer;
-import cn.command.SendMessageCommand;
 import read.ReadListener;
 import read.TaskRead;
 import statistic.StatisticService;
@@ -18,7 +17,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
- * @author Mikhail Zaitsev
+ *
  */
 public class Client implements CommandSetStarterListener, ReadListener {
 
@@ -106,6 +105,10 @@ public class Client implements CommandSetStarterListener, ReadListener {
             clientId);
     sendBroadcastExecutor4.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
     setExecutorsMap.put(CommandSet.TYPE_SEND_BIG_BROADCAST_TO_SEVERAL,sendBroadcastExecutor4);
+
+    GetBroadcastMessageExecutor getBroadcastMessageExecutor = new GetBroadcastMessageExecutor(socketChannel, statisticService, clientId);
+    getBroadcastMessageExecutor.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
+    setExecutorsMap.put(CommandSet.TYPE_GET_BROADCAST_MESSAGE, getBroadcastMessageExecutor);
 
     CommandSetStarter commandGenerator = new CommandSetStarter(timeoutExec, this);
     commandGenerator.start();

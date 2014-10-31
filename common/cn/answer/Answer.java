@@ -7,6 +7,8 @@ public class Answer {
   public static final String SUCCESS = "success";
   public static final String ERROR = "error";
   public static final String QUEUES_LIST = "queues_list";
+  public static final String CLIENTS_LIST = "clients_list";
+  public static final String MESSAGE = "message";
 
 
   private String message;

@@ -1,9 +1,6 @@
 package read;
 
-import cn.answer.Answer;
-import cn.answer.ErrorAnswer;
-import cn.answer.QueueListAnswer;
-import cn.answer.SuccessAnswer;
+import cn.answer.*;
 import cn.model.Queue;
 
 import java.nio.ByteBuffer;
@@ -90,8 +87,26 @@ public class TaskRead implements Runnable{
     } if(Answer.QUEUES_LIST.equals(type)){
       charBuffer.delete(start, end+6);
       return parseQueueListAnswer(answer);
+    } if(Answer.MESSAGE.equals(type)){
+      charBuffer.delete(start, end+6);
+      return parseMessageAnswer(answer);
     }
 
+    return null;
+  }
+
+  private MessageAnswer parseMessageAnswer(String data){
+    try{
+      String text = data.substring(data.indexOf("<text>") + 6);
+      text = text.substring(0, text.indexOf("</text>"));
+      MessageAnswer answer = new MessageAnswer();
+      answer.setText(text);
+      parseCommonFields(answer, data);
+      return answer;
+
+    }catch (Exception e){
+      logger.log(Level.SEVERE, "Error parse CreateQueueCommand" , e);
+    }
     return null;
   }
 

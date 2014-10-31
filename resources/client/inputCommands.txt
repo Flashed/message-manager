@@ -1,8 +1,7 @@
 register_client 1
-create_queue 1
-send_small_broadcast_to_one 3
-send_small_broadcast_to_several 4
+create_queue 5
+send_small_broadcast_to_one 10
+send_small_broadcast_to_several 10
 send_big_broadcast_to_one 5
-send_big_broadcast_to_several 6
-
-
+send_big_broadcast_to_several 5
+get_broadcast_message 15

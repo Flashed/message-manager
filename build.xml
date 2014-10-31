@@ -97,6 +97,7 @@
         <antcall target="libs-client" />
         <mkdir dir="build/client/config" />
         <mkdir dir="build/client/logs" />
+        <mkdir dir="build/client/messages" />
         <copyfile src="resources/client/config.properties"  dest="build/client/config/config.properties" />
         <copyfile src="resources/client/inputCommands.txt"  dest="build/client/config/inputCommands.txt" />
         <copyfile src="resources/client/logging.properties"  dest="build/client/config/logging.properties" />

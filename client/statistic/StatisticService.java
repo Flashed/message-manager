@@ -27,17 +27,32 @@ public class StatisticService {
 
   public StatisticService() {
     try {
-      FileOutputStream statisticFile = new FileOutputStream(fileName);
-      statisticFile.write(String.format("%12s\t\t%14s\t\t%10s\t\t%28s\t\t%19s\t\t%14s\t\t%19s\r\n",
+      FileWriter statisticFile = new FileWriter(fileName, true);
+      statisticFile.write(String.format("%12s\t\t%31s\t\t%10s\t\t%28s\t\t%19s\t\t%14s\t\t%19s\r\n",
               "clientId",
               "commandSetType",
               "answerType",
               "dateSend",
               "timeOfReceiptServer",
               "timeOfExecSql",
-              "timeOfExecuteServer").getBytes());
+              "timeOfExecuteServer"));
       statisticFile.flush();
       statisticFile.close();
+
+      new Thread(new Runnable() {
+        @Override
+        public void run() {
+          while (true){
+            try {
+              Thread.sleep(10000);
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
+              writeToFile();
+          }
+        }
+      }).start();
+
       lastOutTime = System.currentTimeMillis();
     } catch (Exception e){
       logger.log(Level.SEVERE, "Failed to open statistic file");
@@ -46,7 +61,7 @@ public class StatisticService {
 
   public void write(String commandSetType ,Answer answer){
     try {
-      outList.add(String.format("%12s\t\t%14s\t\t%10s\t\t%28s\t\t%19s\t\t%14s\t\t%19s\n",
+      outList.add(String.format("%12s\t\t%31s\t\t%10s\t\t%28s\t\t%19s\t\t%14s\t\t%19s\n",
               clientId,
               commandSetType,
               answer.getType(),
@@ -54,9 +69,6 @@ public class StatisticService {
               answer.getTimeOfReceiptServer(),
               answer.getTimeOfExecSql(),
               answer.getTimeOfExecuteServer()));
-      if ((System.currentTimeMillis() - lastOutTime) > 10000) {
-        writeToFile();
-      }
     }catch (Exception e){
       logger.log(Level.SEVERE, "Failed to write statistic");
     }
@@ -64,15 +76,17 @@ public class StatisticService {
 
   private void writeToFile(){
     try {
-      FileWriter writer = new FileWriter(fileName,true);
-      for(String s :outList){
-        writer.write(s);
+      if(!outList.isEmpty() ){
+        FileWriter writer = new FileWriter(fileName,true);
+        for(String s :outList){
+          writer.write(s);
+        }
+        writer.flush();
+        writer.close();
+        outList.clear();
+        lastOutTime = System.currentTimeMillis();
+        logger.info("Write statistic to " + fileName);
       }
-      writer.flush();
-      writer.close();
-      outList.clear();
-      lastOutTime = System.currentTimeMillis();
-      logger.info("Write statistic to " + fileName);
     } catch (Exception e){
       logger.log(Level.SEVERE, "Failed to write to statistic file");
     }
