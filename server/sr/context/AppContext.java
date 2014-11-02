@@ -34,8 +34,6 @@ public class AppContext {
 
   private Map<Channel, StringBuilder> commandBuffers = new HashMap();
 
-  private Integer messagesCount = -1;
-
   private AppContext() {
 
   }
@@ -102,12 +100,4 @@ public class AppContext {
     return messageDao;
   }
 
-  public Integer getMessagesCount() {
-    return messagesCount;
-  }
-
-  public void setMessagesCount(Integer messagesCount) {
-      this.messagesCount = messagesCount;
-
-  }
 }

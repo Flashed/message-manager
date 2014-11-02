@@ -76,16 +76,18 @@ public class StatisticService {
 
   private void writeToFile(){
     try {
-      if(!outList.isEmpty() ){
-        FileWriter writer = new FileWriter(fileName,true);
-        for(String s :outList){
-          writer.write(s);
+      synchronized (outList){
+        if(!outList.isEmpty() ){
+          FileWriter writer = new FileWriter(fileName,true);
+          for(String s :outList){
+            writer.write(s);
+          }
+          writer.flush();
+          writer.close();
+          outList.clear();
+          lastOutTime = System.currentTimeMillis();
+          logger.info("Write statistic to " + fileName);
         }
-        writer.flush();
-        writer.close();
-        outList.clear();
-        lastOutTime = System.currentTimeMillis();
-        logger.info("Write statistic to " + fileName);
       }
     } catch (Exception e){
       logger.log(Level.SEVERE, "Failed to write to statistic file");

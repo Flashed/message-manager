@@ -3,10 +3,7 @@ package sr.dao;
 import cn.model.Message;
 import sr.context.AppContext;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,32 +17,23 @@ public class MessageDaoImpl implements MessageDao{
   @Override
   public void save(Message message) {
 
-    Integer messageCount = getMessageCount();
-    synchronized (messageCount){
-      if(messageCount == -1){
-        AppContext.getAppContext().setMessagesCount(getLastMessageCount());
-      }
-    }
-
-    String sql = "insert into messages values (?, ?, ?, ?, ?)";
+    String sql = "insert into messages values (default, ?, ?, ?, ?)";
     try (
             Connection connection = getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql)
+            PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
     ) {
 
-      messageCount = getMessageCount();
-      synchronized (messageCount){
-        AppContext.getAppContext().setMessagesCount(messageCount + 1);
-        message.setId(getMessageCount());
-      }
-      statement.setInt(1, message.getId());
-      statement.setInt(2, message.getQueueId());
-      statement.setInt(3, message.getSenderId());
-      statement.setInt(4, message.getReceiverId());
-      statement.setString(5, message.getText());
-      if(statement.execute()){
+      statement.setInt(1, message.getQueueId());
+      statement.setInt(2, message.getSenderId());
+      statement.setInt(3, message.getReceiverId());
+      statement.setString(4, message.getText());
+      statement.execute();
+      ResultSet resultSet = statement.getGeneratedKeys();
+      if(resultSet.next()){
+        message.setId(resultSet.getInt(1));
         logger.info("Save " + message);
       }
+      resultSet.close();
       statement.close();
       connection.close();
     } catch (SQLException e) {
@@ -145,7 +133,4 @@ public class MessageDaoImpl implements MessageDao{
     return AppContext.getAppContext().getPoolingDataSource().getConnection();
   }
 
-  private Integer getMessageCount(){
-    return AppContext.getAppContext().getMessagesCount();
-  }
 }

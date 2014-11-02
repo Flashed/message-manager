@@ -16,15 +16,19 @@ public class QueueDaoImpl implements QueueDao{
   @Override
   public void save(Queue queue) {
 
-    String sql = "insert into queues values (?)";
+    String sql = "insert into queues values (default)";
     try (
         Connection connection = getConnection();
-        PreparedStatement statement = connection.prepareStatement(sql)
+        PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
     ) {
-      statement.setInt(1, queue.getId());
-      if(statement.execute()){
+
+      statement.execute();
+      ResultSet resultSet = statement.getGeneratedKeys();
+      if(resultSet.next()){
+        queue.setId(resultSet.getInt(1));
         logger.info("Save " + queue);
       }
+
       statement.close();
       connection.close();
     } catch (SQLException e) {

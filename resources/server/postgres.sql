@@ -1,12 +1,12 @@
 DROP TABLE clients;
 CREATE TABLE clients(
-  id int,
+  id serial,
   PRIMARY KEY (id)
 );
 
 DROP TABLE messages;
 CREATE TABLE messages (
-  id int,
+  id serial,
   queueId int,
   senderId int,
   receiverId int,
@@ -16,6 +16,6 @@ CREATE TABLE messages (
 
 DROP TABLE queues;
 CREATE TABLE queues(
-  id int,
+  id serial,
   PRIMARY KEY (id)
 );
