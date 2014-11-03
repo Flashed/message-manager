@@ -10,8 +10,11 @@ import statistic.StatisticService;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -32,7 +35,7 @@ public class Client implements CommandSetStarterListener, ReadListener {
   private SocketChannel socketChannel;
 
   private Map<String, CommandSetExecutor> setExecutorsMap = new HashMap<>();
-  private Map<Long, CommandSetExecutor> handlesTimesExecutorsMap = new HashMap<>();
+  private final Map<Long, CommandSetExecutor> handlesTimesExecutorsMap = new HashMap<>();
 
   private TaskRead taskRead;
 
@@ -129,10 +132,13 @@ public class Client implements CommandSetStarterListener, ReadListener {
 
   @Override
   public void onReadAnswer(Answer answer) {
-    if(handlesTimesExecutorsMap.containsKey(answer.getDateSend())){
-      handlesTimesExecutorsMap.remove(answer.getDateSend()).handleAnswer(answer);
+    synchronized (handlesTimesExecutorsMap){
+      Collection<Long> keys = handlesTimesExecutorsMap.keySet();
+      logger.fine("keys " + keys + "\n answer key " + answer.getDateSend());
+      if(handlesTimesExecutorsMap.containsKey(answer.getDateSend())){
+        handlesTimesExecutorsMap.remove(answer.getDateSend()).handleAnswer(answer);
+      }
     }
-
   }
 
   public static void main(String... args){

@@ -2,6 +2,8 @@ package sr.dao;
 
 import cn.model.Message;
 
+import java.sql.Connection;
+
 /**
  * Message DAO
  */
@@ -12,5 +14,7 @@ public interface MessageDao {
   void delete(Message message);
 
   Message get(int queueId, int receiverId);
+
+  Message get(int queueId, int receiverId, Connection connection);
 
 }

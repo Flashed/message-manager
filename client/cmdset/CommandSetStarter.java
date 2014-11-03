@@ -71,6 +71,7 @@ public class CommandSetStarter {
       for(CommandSet cmdExec: cmdExecList){
         for(int i=0; i<cmdExec.getExecCount(); i++){
           if(listener != null){
+            cmdExec.setId(i);
             listener.onGetCommandSet(cmdExec);
             logger.info(String.format("Execute  %s iteration %s", cmdExec.getType(), i+1));
             try {

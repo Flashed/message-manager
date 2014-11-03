@@ -44,13 +44,17 @@ public class GetMessageTask implements Runnable{
         synchronized (clientChannel) {
           MessageAnswer answer = new MessageAnswer();
           answer.setText(message.getText());
+          answer.setCommandSetId(command.getCommandSetId());
+          answer.setMessageId(message.getId());
           Answer.setTimeToAnswer(command, answer, startExecTime, endExecSqlTime);
           clientChannel.write(ByteBuffer.wrap(
                   answer.toString().getBytes()));
+          logger.info("Send " + message);
         }
       } else {
         synchronized (clientChannel) {
           Answer answer = new SuccessAnswer("Messages not found");
+          answer.setCommandSetId(command.getCommandSetId());
           Answer.setTimeToAnswer(command, answer, startExecTime, endExecSqlTime);
           clientChannel.write(ByteBuffer.wrap(
                   answer.toString().getBytes()));
@@ -63,6 +67,7 @@ public class GetMessageTask implements Runnable{
       try {
         synchronized (clientChannel) {
           ErrorAnswer answer = new ErrorAnswer("Failed to get message");
+          answer.setCommandSetId(command.getCommandSetId());
           Answer.setTimeToAnswer(command, answer, startExecTime, 0);
           clientChannel.write(ByteBuffer.wrap(
                   answer.toString().getBytes()));

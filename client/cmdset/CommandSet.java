@@ -17,6 +17,8 @@ public class CommandSet {
 
   private int execCount;
 
+  private int id;
+
   public CommandSet() {
     setExecCount(1);
   }
@@ -35,5 +37,13 @@ public class CommandSet {
 
   public void setExecCount(int execCount) {
     this.execCount = execCount;
+  }
+
+  public int getId() {
+    return id;
+  }
+
+  public void setId(int id) {
+    this.id = id;
   }
 }

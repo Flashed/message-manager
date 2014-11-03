@@ -55,6 +55,7 @@ public class SendMessageTask implements Runnable{
 
       synchronized (clientChannel) {
         SuccessAnswer answer = new SuccessAnswer("The message send");
+        answer.setCommandSetId(command.getCommandSetId());
         Answer.setTimeToAnswer(command, answer, startExecTime, endExecSqlTime);
         clientChannel.write(ByteBuffer.wrap(
                 answer.toString().getBytes()));
@@ -64,6 +65,7 @@ public class SendMessageTask implements Runnable{
       try {
         synchronized (clientChannel) {
           ErrorAnswer answer = new ErrorAnswer("Failed to send message");
+          answer.setCommandSetId(command.getCommandSetId());
           Answer.setTimeToAnswer(command, answer, startExecTime, 0);
           clientChannel.write(ByteBuffer.wrap(
                   answer.toString().getBytes()));

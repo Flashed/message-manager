@@ -37,6 +37,7 @@ public class GetQueueListTask implements Runnable{
       long endExecSqlTime = System.currentTimeMillis() - startExecTime;
       synchronized (clientChannel){
         QueueListAnswer queueListAnswer = new QueueListAnswer(queues);
+        queueListAnswer.setCommandSetId(command.getCommandSetId());
         Answer.setTimeToAnswer(command, queueListAnswer, startExecTime, endExecSqlTime);
         clientChannel.write(ByteBuffer.wrap(
                 queueListAnswer.toString()
@@ -49,6 +50,7 @@ public class GetQueueListTask implements Runnable{
       try {
         synchronized (clientChannel) {
           ErrorAnswer answer = new ErrorAnswer("Error get list of queues");
+          answer.setCommandSetId(command.getCommandSetId());
           Answer.setTimeToAnswer(command, answer, startExecTime, 0);
           clientChannel.write(ByteBuffer.wrap(
                   new ErrorAnswer().toString().getBytes()));

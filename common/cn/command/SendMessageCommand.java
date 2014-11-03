@@ -49,6 +49,7 @@ public class SendMessageCommand extends Command{
             "    <clientId>"+ getClientId() +"</clientId>\n" +
             "    <dateSend>"+ getDateSend() +"</dateSend>\n" +
             "    <text>"+ getText() +"</text>\n" +
+            "    <commandSetId>"+ getCommandSetId() +"</commandSetId>\n" +
             "</cmd>";
   }
 }

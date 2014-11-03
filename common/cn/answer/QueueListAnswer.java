@@ -44,6 +44,7 @@ public class QueueListAnswer extends Answer{
             "    <timeOfExecuteServer>"+getTimeOfExecuteServer()+"</timeOfExecuteServer>\n" +
             "    <dateAnswer>"+getDateAnswer()+"</dateAnswer>\n" +
             "    <dateAnswer>"+getDateAnswer()+"</dateAnswer>\n" +
+            "    <commandSetId>"+getCommandSetId()+"</commandSetId>\n" +
             "    <ids>\n" +
             "" + data.toString() + "\n" +
             "    </ids>\n" +

@@ -38,9 +38,15 @@ public class RegisterClientExecutor implements CommandSetExecutor{
   @Override
   public void execute(CommandSet commandSet) {
     try{
-      Command command = createRegisterClientCommand();
-      handlesTimesExecutorsMap.put(command.getDateSend(), this);
+      Command command = createRegisterClientCommand(commandSet);
+      synchronized (handlesTimesExecutorsMap){
+        if(handlesTimesExecutorsMap.containsKey(command.getDateSend())){
+          logger.log(Level.SEVERE, "handlesTimesExecutorsMap already contains key");
+        }
+        handlesTimesExecutorsMap.put(command.getDateSend(), this);
+      }
       socketChannel.write(ByteBuffer.wrap(command.toString().getBytes()));
+      logger.info("Send command " + command);
     }catch (Exception e){
       logger.log(Level.SEVERE, "Error send command ", e);
     }
@@ -56,10 +62,11 @@ public class RegisterClientExecutor implements CommandSetExecutor{
     this.handlesTimesExecutorsMap = handlesTimesExecutorsMap;
   }
 
-  private RegisterClientCommand createRegisterClientCommand(){
+  private RegisterClientCommand createRegisterClientCommand(CommandSet commandSet){
     RegisterClientCommand command = new RegisterClientCommand();
+    command.setCommandSetId(commandSet.getId());
     command.setClientId(clientId);
-    command.setDateSend(System.currentTimeMillis());
+    command.setDateSend(System.nanoTime());
     return command;
   }
 }

@@ -48,6 +48,7 @@ public class RegisterClientTask implements Runnable {
 
       synchronized (clientChannel){
         SuccessAnswer answer = new SuccessAnswer("The client registered");
+        answer.setCommandSetId(command.getCommandSetId());
         Answer.setTimeToAnswer(command, answer, startExecTime, endExecSqlTime);
         clientChannel.write(ByteBuffer.wrap(
                 answer.toString().getBytes()));
@@ -57,6 +58,7 @@ public class RegisterClientTask implements Runnable {
       try {
         synchronized (clientChannel){
           ErrorAnswer answer = new ErrorAnswer("The client not registered");
+          answer.setCommandSetId(command.getCommandSetId());
           Answer.setTimeToAnswer(command, answer, startExecTime, 0);
           clientChannel.write(ByteBuffer.wrap(
                   answer.toString().getBytes()));

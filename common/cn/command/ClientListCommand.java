@@ -13,6 +13,7 @@ public class ClientListCommand extends Command{
             "    <type>" + getType() + "</type>\n" +
             "    <clientId>"+ getClientId() +"</clientId>\n" +
             "    <dateSend>"+ getDateSend() +"</dateSend>\n" +
+            "    <commandSetId>"+ getCommandSetId() +"</commandSetId>\n" +
             "</cmd>";
   }
 

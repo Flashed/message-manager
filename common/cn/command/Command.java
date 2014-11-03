@@ -21,6 +21,8 @@ public abstract class Command {
 
   private long dateRecipient;
 
+  private int commandSetId;
+
   public String getType() {
     return type;
   }
@@ -51,5 +53,13 @@ public abstract class Command {
 
   public void setDateRecipient(long dateRecipient) {
     this.dateRecipient = dateRecipient;
+  }
+
+  public int getCommandSetId() {
+    return commandSetId;
+  }
+
+  public void setCommandSetId(int commandSetId) {
+    this.commandSetId = commandSetId;
   }
 }

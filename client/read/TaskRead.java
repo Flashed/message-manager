@@ -90,7 +90,7 @@ public class TaskRead implements Runnable{
       charBuffer.delete(start, end+6);
       return parseMessageAnswer(answer);
     }
-
+    logger.warning("Answer type not found");
     return null;
   }
 
@@ -98,9 +98,13 @@ public class TaskRead implements Runnable{
     try{
       String text = data.substring(data.indexOf("<text>") + 6);
       text = text.substring(0, text.indexOf("</text>"));
+      String messageId = data.substring(data.indexOf("<messageId>") + 11);
+      messageId = messageId.substring(0, messageId.indexOf("</messageId>"));
       MessageAnswer answer = new MessageAnswer();
       answer.setText(text);
+      answer.setMessageId(Integer.valueOf(messageId));
       parseCommonFields(answer, data);
+      logger.info("");
       return answer;
 
     }catch (Exception e){
@@ -130,6 +134,7 @@ public class TaskRead implements Runnable{
 
       QueueListAnswer answer = new QueueListAnswer(queues);
       parseCommonFields(answer, data);
+      logger.info("");
       return answer;
 
     }catch (Exception e){
@@ -143,6 +148,7 @@ public class TaskRead implements Runnable{
     try{
       SuccessAnswer answer = new SuccessAnswer();
       parseCommonFields(answer, data);
+      logger.info("");
       return answer;
 
     }catch (Exception e){
@@ -155,6 +161,7 @@ public class TaskRead implements Runnable{
     try{
       ErrorAnswer answer = new ErrorAnswer();
       parseCommonFields(answer, data);
+      logger.info("");
       return answer;
     }catch (Exception e){
       logger.log(Level.SEVERE, "Error parse CreateQueueCommand" , e);
@@ -175,6 +182,8 @@ public class TaskRead implements Runnable{
     timeOfExecuteServer = timeOfExecuteServer.substring(0, timeOfExecuteServer.indexOf("</timeOfExecuteServer>"));
     String dateAnswer = data.substring(data.indexOf("<dateAnswer>") + 12);
     dateAnswer = dateAnswer.substring(0, dateAnswer.indexOf("</dateAnswer>"));
+    String commandSetId = data.substring(data.indexOf("<commandSetId>") + 14);
+    commandSetId = commandSetId.substring(0, commandSetId.indexOf("</commandSetId>"));
 
     answer.setMessage(mes);
     answer.setDateSend(Long.valueOf(dateSend));
@@ -182,19 +191,23 @@ public class TaskRead implements Runnable{
     answer.setTimeOfExecSql(Long.valueOf(timeOfExecSql));
     answer.setTimeOfExecuteServer(Long.valueOf(timeOfExecuteServer));
     answer.setDateAnswer(Long.valueOf(dateAnswer));
+    answer.setCommandSetId(Integer.valueOf(commandSetId));
 
   }
 
   private void writeToCharBuffer(){
     readBuffer.flip();
     byte[] bytes = readBuffer.array();
+    int l = charBuffer.length();
     for(int i = readBuffer.position(); i<readBuffer.limit(); i++){
       if(charBuffer.length() > (100*1000*1024)){
         charBuffer.setLength(0);
+        logger.warning("charBuffer.length() > " + (100*1000*1024));
         break;
       }
       charBuffer.append((char)bytes[i]);
     }
+    logger.info("Added to buffer " + charBuffer.substring(l));
     readBuffer.clear();
   }
 

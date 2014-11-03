@@ -53,9 +53,8 @@ public class MessageDaoImpl implements MessageDao{
             PreparedStatement statement = connection.prepareStatement(sql);
             ){
       statement.setInt(1, message.getId());
-      if(statement.execute()){
-        logger.info("Message " + message+ " deleted");
-      }
+      statement.execute();
+      logger.info("Message " + message+ " deleted");
       connection.close();
       statement.close();
     } catch (Exception e){
@@ -102,7 +101,45 @@ public class MessageDaoImpl implements MessageDao{
 
     }
 
+    logger.log(Level.SEVERE, "selected message is null");
+    return null;
+  }
 
+  @Override
+  public Message get(int queueId, int receiverId, Connection connection) {
+    String sql = "select * from messages where queueId=? and receiverId=? limit 1";
+
+    try (
+            PreparedStatement statement = connection.prepareStatement(sql);
+    ) {
+
+      statement.setInt(1, queueId);
+      statement.setInt(2, receiverId);
+      ResultSet resultSet = statement.executeQuery();
+      if (resultSet.next()){
+        Message message = new Message();
+        message.setText(resultSet.getString("mess_text"));
+        message.setId(resultSet.getInt("id"));
+        message.setQueueId(resultSet.getInt("queueid"));
+        message.setSenderId(resultSet.getInt("senderid"));
+        message.setReceiverId(resultSet.getInt("receiverid"));
+
+        resultSet.close();
+        statement.close();
+        connection.close();
+        return message;
+      }
+      resultSet.close();
+      statement.close();
+      connection.close();
+    } catch (Exception e) {
+      RuntimeException wrap = new RuntimeException("Error get message", e);
+      logger.log(Level.SEVERE, "", e);
+      throw wrap;
+
+    }
+
+    logger.log(Level.SEVERE, "selected message is null");
     return null;
   }
 

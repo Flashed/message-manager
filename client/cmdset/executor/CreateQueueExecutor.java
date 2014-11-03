@@ -39,8 +39,13 @@ public class CreateQueueExecutor implements CommandSetExecutor{
   @Override
   public void execute(CommandSet commandSet) {
     try{
-      Command command = createCreateQueueCommand();
-      handlesTimesExecutorsMap.put(command.getDateSend(), this);
+      Command command = createCreateQueueCommand(commandSet);
+      synchronized (handlesTimesExecutorsMap){
+        if(handlesTimesExecutorsMap.containsKey(command.getDateSend())){
+          logger.log(Level.SEVERE, "handlesTimesExecutorsMap already contains key");
+        }
+        handlesTimesExecutorsMap.put(command.getDateSend(), this);
+      }
       socketChannel.write(ByteBuffer.wrap(command.toString().getBytes()));
     }catch (Exception e){
       logger.log(Level.SEVERE, "Error send command ", e);
@@ -57,10 +62,11 @@ public class CreateQueueExecutor implements CommandSetExecutor{
     this.handlesTimesExecutorsMap = handlesTimesExecutorsMap;
   }
 
-  private CreateQueueCommand createCreateQueueCommand(){
+  private CreateQueueCommand createCreateQueueCommand(CommandSet commandSet){
     CreateQueueCommand cmd = new CreateQueueCommand();
+    cmd.setCommandSetId(commandSet.getId());
     cmd.setQueueId((int)(Math.random()*100000));
-    cmd.setDateSend(System.currentTimeMillis());
+    cmd.setDateSend(System.nanoTime());
     return cmd;
   }
 }

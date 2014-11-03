@@ -48,6 +48,7 @@ public class CreateQueueTask implements Runnable{
 
       synchronized (clientChannel){
         SuccessAnswer answer = new SuccessAnswer("The queue created");
+        answer.setCommandSetId(command.getCommandSetId());
         Answer.setTimeToAnswer(command, answer, startExecTime, endExecSqlTime);
         clientChannel.write(ByteBuffer.wrap(
                 answer.toString().getBytes()));
@@ -59,6 +60,7 @@ public class CreateQueueTask implements Runnable{
       try {
         synchronized (clientChannel){
           ErrorAnswer answer = new ErrorAnswer("The queue not created");
+          answer.setCommandSetId(command.getCommandSetId());
           Answer.setTimeToAnswer(command, answer, startExecTime, 0);
           clientChannel.write(ByteBuffer.wrap(
                   answer.toString().getBytes()));

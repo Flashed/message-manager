@@ -28,11 +28,13 @@ public class ParseTask implements Runnable {
     try {
       StringBuilder buffer = getBuffer();
       synchronized (buffer){
+        logger.fine("Current buffer state " + buffer);
         while (checkBuffer(buffer)){
           Command command = parseCommand(buffer);
           if(command == null){
             return;
           }
+          logger.info("Parsed command " + command.getType());
           command.setDateRecipient(System.currentTimeMillis());
           if(command instanceof CreateQueueCommand){
             getExecutor().execute(new CreateQueueTask((CreateQueueCommand) command, clientChanel));
@@ -186,9 +188,12 @@ public class ParseTask implements Runnable {
     clientId = clientId.substring(0, clientId.indexOf("</clientId>"));
     String dateSend = data.substring(data.indexOf("<dateSend>") + 10);
     dateSend = dateSend.substring(0, dateSend.indexOf("</dateSend>"));
+    String commandSetId = data.substring(data.indexOf("<commandSetId>") + 14);
+    commandSetId = commandSetId.substring(0, commandSetId.indexOf("</commandSetId>"));
 
     command.setClientId(Integer.valueOf(clientId));
     command.setDateSend(Long.valueOf(dateSend));
+    command.setCommandSetId(Integer.valueOf(commandSetId));
   }
 
   private StringBuilder getBuffer(){

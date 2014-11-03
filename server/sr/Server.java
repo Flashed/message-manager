@@ -121,6 +121,7 @@ public class Server {
       // the selection key and close the channel.
       key.cancel();
       socketChannel.close();
+      logger.log(Level.FINE, "Error read client socketChannel", e);
       return;
     }
 
@@ -129,6 +130,7 @@ public class Server {
       // same from our end and cancel the channel.
       key.channel().close();
       key.cancel();
+      logger.log(Level.FINE, "Client SocketChannel is closed");
       return;
     }
 
@@ -138,6 +140,7 @@ public class Server {
       writeToCharBuffer(buffer, readBuffer);
     }
     poolExecutor.execute(new ParseTask(readBuffer, socketChannel));
+    logger.fine("Size of task queue " + poolExecutor.getQueue().size());
   }
 
   private StringBuilder getBuffer(SocketChannel clientChanel){
@@ -152,12 +155,17 @@ public class Server {
   private void writeToCharBuffer(StringBuilder buffer, ByteBuffer byteBuffer){
     byteBuffer.flip();
     byte[] bytes = byteBuffer.array();
+    int l = buffer.length();
     for(int i = byteBuffer.position(); i<byteBuffer.limit(); i++){
       if(buffer.length() > (100*1000*1024)){
         buffer.setLength(0);
+        logger.warning("buffer.length() > " + (100*1000*1024));
         break;
       }
       buffer.append((char)bytes[i]);
+    }
+    if(logger.isLoggable(Level.FINE)){
+      logger.fine("Added to buffer " + buffer.substring(l, buffer.length()));
     }
     byteBuffer.clear();
   }

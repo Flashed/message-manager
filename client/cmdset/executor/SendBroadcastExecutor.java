@@ -56,9 +56,14 @@ public class SendBroadcastExecutor implements CommandSetExecutor{
 
   @Override
   public void execute(CommandSet commandSet) {
-    QueueListCommand command = createQueueListCommand();
-    handlesTimesExecutorsMap.put(command.getDateSend(), this);
-    sendCommand(createQueueListCommand());
+    QueueListCommand command = createQueueListCommand(commandSet);
+    synchronized (handlesTimesExecutorsMap){
+      if(handlesTimesExecutorsMap.containsKey(command.getDateSend())){
+        logger.log(Level.SEVERE, "handlesTimesExecutorsMap already contains key");
+      }
+      handlesTimesExecutorsMap.put(command.getDateSend(), this);
+    }
+    sendCommand(command);
   }
 
   @Override
@@ -68,11 +73,17 @@ public class SendBroadcastExecutor implements CommandSetExecutor{
       QueueListAnswer ans = (QueueListAnswer) answer;
       List<Queue> queues = ans.getQueues();
       if(queues.isEmpty()){
+        logger.warning("list of Queues is empty");
         return;
       }
       if(countQueuesMode.equals(CountQueuesMode.MODE_ONE)){
-        SendMessageCommand sendMessageCommand = createSendMessageCommand(queues);
-        handlesTimesExecutorsMap.put(sendMessageCommand.getDateSend(), this);
+        SendMessageCommand sendMessageCommand = createSendMessageCommand(queues, answer);
+        synchronized (handlesTimesExecutorsMap){
+          if(handlesTimesExecutorsMap.containsKey(sendMessageCommand.getDateSend())){
+            logger.log(Level.SEVERE, "handlesTimesExecutorsMap already contains key");
+          }
+          handlesTimesExecutorsMap.put(sendMessageCommand.getDateSend(), this);
+        }
         sendCommand(sendMessageCommand);
       } else {
         int c = 10;
@@ -80,8 +91,13 @@ public class SendBroadcastExecutor implements CommandSetExecutor{
           c = queues.size();
         }
         for(int i = 0; i < c; i++){
-          SendMessageCommand sendMessageCommand = createSendMessageCommand(queues);
-          handlesTimesExecutorsMap.put(sendMessageCommand.getDateSend(), this);
+          SendMessageCommand sendMessageCommand = createSendMessageCommand(queues, answer);
+          synchronized (handlesTimesExecutorsMap){
+            if(handlesTimesExecutorsMap.containsKey(sendMessageCommand.getDateSend())){
+              logger.log(Level.SEVERE, "handlesTimesExecutorsMap already contains key");
+            }
+            handlesTimesExecutorsMap.put(sendMessageCommand.getDateSend(), this);
+          }
           sendCommand(sendMessageCommand);
         }
       }
@@ -97,19 +113,21 @@ public class SendBroadcastExecutor implements CommandSetExecutor{
   private void sendCommand(Command command){
     try{
       socketChannel.write(ByteBuffer.wrap(command.toString().getBytes()));
+      logger.info("Send command " + command);
     }catch (Exception e){
       logger.log(Level.SEVERE, "Error send command ", e);
     }
   }
 
-  private QueueListCommand createQueueListCommand(){
+  private QueueListCommand createQueueListCommand(CommandSet commandSet){
     QueueListCommand command = new QueueListCommand();
+    command.setCommandSetId(commandSet.getId());
     command.setClientId(clientId);
-    command.setDateSend(System.currentTimeMillis());
+    command.setDateSend(System.nanoTime());
     return command;
   }
 
-  private SendMessageCommand createSendMessageCommand(List<Queue> queues){
+  private SendMessageCommand createSendMessageCommand(List<Queue> queues, Answer answer){
     String text = "";
     if(sizeMessageMode.equals(SizeMessageMode.MODE_BIG)){
       text = StringGenerator.generate(2000);
@@ -118,6 +136,7 @@ public class SendBroadcastExecutor implements CommandSetExecutor{
     }
 
     SendMessageCommand command = new SendMessageCommand();
+    command.setCommandSetId(answer.getCommandSetId());
     command.setClientId(clientId);
     command.setText(text);
 
@@ -126,7 +145,7 @@ public class SendBroadcastExecutor implements CommandSetExecutor{
     id = Math.random() * (queues.size()-1);
     queue = queues.get((int)id);
     command.setQueueId(queue.getId());
-    command.setDateSend(System.currentTimeMillis());
+    command.setDateSend(System.nanoTime());
 
     return command;
   }

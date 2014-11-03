@@ -43,9 +43,14 @@ public class GetBroadcastMessageExecutor implements CommandSetExecutor {
 
   @Override
   public void execute(CommandSet commandSet) {
-    QueueListCommand command = createQueueListCommand();
-    handlesTimesExecutorsMap.put(command.getDateSend(), this);
-    sendCommand(createQueueListCommand());
+    QueueListCommand command = createQueueListCommand(commandSet);
+    synchronized (handlesTimesExecutorsMap){
+      if(handlesTimesExecutorsMap.containsKey(command.getDateSend())){
+        logger.log(Level.SEVERE, "handlesTimesExecutorsMap already contains key");
+      }
+      handlesTimesExecutorsMap.put(command.getDateSend(), this);
+      sendCommand(command);
+    }
   }
 
   @Override
@@ -57,16 +62,21 @@ public class GetBroadcastMessageExecutor implements CommandSetExecutor {
       if(queues.isEmpty()){
         return;
       }
-      GetMeMessageCommand command = createGetMeMessageCommand(queues);
-      handlesTimesExecutorsMap.put(command.getDateSend(), this);
+      GetMeMessageCommand command = createGetMeMessageCommand(queues, answer);
+      synchronized (handlesTimesExecutorsMap){
+        if(handlesTimesExecutorsMap.containsKey(command.getDateSend())){
+          logger.log(Level.SEVERE, "handlesTimesExecutorsMap already contains key");
+        }
+        handlesTimesExecutorsMap.put(command.getDateSend(), this);
+      }
       sendCommand(command);
     } else if (answer instanceof MessageAnswer){
       try {
-        FileWriter writer = new FileWriter("./messages/"+ answer.getDateSend() + ".txt");
+        FileWriter writer = new FileWriter("./messages/" + ((MessageAnswer) answer).getMessageId() +".txt");
         writer.write(((MessageAnswer) answer).getText());
         writer.flush();
         writer.close();
-        logger.info("Save message to file "  + "./messages/"+ answer.getDateSend() + ".txt");
+        logger.info("Save message to file "  + "./messages/"+ ((MessageAnswer) answer).getMessageId() +".txt");
       } catch (IOException e) {
         logger.log(Level.SEVERE, "Error save message to folder", e);
       }
@@ -78,15 +88,17 @@ public class GetBroadcastMessageExecutor implements CommandSetExecutor {
     this.handlesTimesExecutorsMap = handlesTimesExecutorsMap;
   }
 
-  private QueueListCommand createQueueListCommand(){
+  private QueueListCommand createQueueListCommand(CommandSet commandSet){
     QueueListCommand command = new QueueListCommand();
+    command.setCommandSetId(commandSet.getId());
     command.setClientId(clientId);
-    command.setDateSend(System.currentTimeMillis());
+    command.setDateSend(System.nanoTime());
     return command;
   }
 
-  private GetMeMessageCommand createGetMeMessageCommand(List<Queue> queues){
+  private GetMeMessageCommand createGetMeMessageCommand(List<Queue> queues, Answer answer){
     GetMeMessageCommand command = new GetMeMessageCommand();
+    command.setCommandSetId(answer.getCommandSetId());
     command.setClientId(-1);
 
     double id;
@@ -94,7 +106,7 @@ public class GetBroadcastMessageExecutor implements CommandSetExecutor {
     id = Math.random() * (queues.size()-1);
     queue = queues.get((int)id);
     command.setQueueId(queue.getId());
-    command.setDateSend(System.currentTimeMillis());
+    command.setDateSend(System.nanoTime());
 
     return command;
   }
@@ -102,6 +114,7 @@ public class GetBroadcastMessageExecutor implements CommandSetExecutor {
   private void sendCommand(Command command){
     try{
       socketChannel.write(ByteBuffer.wrap(command.toString().getBytes()));
+      logger.info("Send command " + command);
     }catch (Exception e){
       logger.log(Level.SEVERE, "Error send command ", e);
     }

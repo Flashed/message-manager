@@ -25,6 +25,8 @@ public class Answer {
 
   private long dateAnswer;
 
+  private int commandSetId;
+
   public String getMessage() {
     return message;
   }
@@ -79,6 +81,14 @@ public class Answer {
 
   public void setDateAnswer(long dateAnswer) {
     this.dateAnswer = dateAnswer;
+  }
+
+  public int getCommandSetId() {
+    return commandSetId;
+  }
+
+  public void setCommandSetId(int commandSetId) {
+    this.commandSetId = commandSetId;
   }
 
   public static void setTimeToAnswer(Command command, Answer answer, long startExecTime, long endExecSqlTime){

@@ -24,6 +24,7 @@ public class ErrorAnswer extends Answer{
             "    <timeOfExecSql>"+getTimeOfExecSql()+"</timeOfExecSql>\n" +
             "    <timeOfExecuteServer>"+getTimeOfExecuteServer()+"</timeOfExecuteServer>\n" +
             "    <dateAnswer>"+getDateAnswer()+"</dateAnswer>\n" +
+            "    <commandSetId>"+getCommandSetId()+"</commandSetId>\n" +
             "</ans>";
   }
 
