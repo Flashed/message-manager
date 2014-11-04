@@ -11,7 +11,12 @@ public class CommandSet {
   public static final String TYPE_SEND_SMALL_BROADCAST_TO_SEVERAL = "send_small_broadcast_to_several";
   public static final String TYPE_SEND_BIG_BROADCAST_TO_ONE = "send_big_broadcast_to_one";
   public static final String TYPE_SEND_BIG_BROADCAST_TO_SEVERAL = "send_big_broadcast_to_several";
+  public static final String TYPE_SEND_SMALL_MESSAGE_TO_ONE = "send_small_message_to_one";
+  public static final String TYPE_SEND_SMALL_MESSAGE_TO_SEVERAL = "send_small_message_to_several";
+  public static final String TYPE_SEND_BIG_MESSAGE_TO_ONE = "send_big_message_to_one";
+  public static final String TYPE_SEND_BIG_MESSAGE_TO_SEVERAL = "send_big_message_to_several";
   public static final String TYPE_GET_BROADCAST_MESSAGE = "get_broadcast_message";
+  public static final String TYPE_GET_MESSAGE = "get_message";
 
 
 

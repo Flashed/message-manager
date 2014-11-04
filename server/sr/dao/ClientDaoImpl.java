@@ -45,6 +45,9 @@ public class ClientDaoImpl implements ClientDao {
         client.setId(resultSet.getInt("id"));
         result.add(client);
       }
+      resultSet.close();
+      statement.close();
+      connection.close();
     } catch (Exception e){
       RuntimeException wrap = new RuntimeException("Failed to get list of clients", e);
       logger.log(Level.SEVERE, "", e);

@@ -1,6 +1,8 @@
 package cmdset.executor;
 
 import cmdset.CommandSet;
+import cmdset.executor.params.CountQueuesMode;
+import cmdset.executor.params.SizeMessageMode;
 import cn.answer.Answer;
 import cn.answer.QueueListAnswer;
 import cn.command.Command;
@@ -24,8 +26,6 @@ public class SendBroadcastExecutor implements CommandSetExecutor{
 
   private static final Logger logger = Logger.getLogger(SendBroadcastExecutor.class.getName());
 
-  public enum CountQueuesMode{MODE_ONE,MODE_SEVERAL}
-  public enum SizeMessageMode{MODE_SMALL,MODE_BIG}
 
   private String commandSetType;
 

@@ -1,6 +1,8 @@
 package cmdset.executor;
 
 import cmdset.CommandSet;
+import cmdset.executor.params.CountQueuesMode;
+import cmdset.executor.params.SizeMessageMode;
 import cn.answer.Answer;
 import cn.answer.ClientListAnswer;
 import cn.answer.QueueListAnswer;
@@ -34,9 +36,9 @@ public class SendMessageExecutor implements CommandSetExecutor{
   private StatisticService statisticService;
 
 
-  private SendBroadcastExecutor.CountQueuesMode countQueuesMode;
+  private CountQueuesMode countQueuesMode;
 
-  private SendBroadcastExecutor.SizeMessageMode sizeMessageMode;
+  private SizeMessageMode sizeMessageMode;
 
   private Map<Long, CommandSetExecutor> handlesTimesExecutorsMap;
 
@@ -46,7 +48,7 @@ public class SendMessageExecutor implements CommandSetExecutor{
 
   public SendMessageExecutor(String commandSetType, SocketChannel socketChannel,
                              StatisticService statisticService,
-                             SendBroadcastExecutor.CountQueuesMode countQueuesMode, SendBroadcastExecutor.SizeMessageMode sizeMessageMode,
+                             CountQueuesMode countQueuesMode, SizeMessageMode sizeMessageMode,
                              int clientId) {
     this.commandSetType = commandSetType;
     this.socketChannel = socketChannel;
@@ -78,7 +80,7 @@ public class SendMessageExecutor implements CommandSetExecutor{
         logger.warning("list of Queues is empty");
         return;
       }
-      if(countQueuesMode.equals(SendBroadcastExecutor.CountQueuesMode.MODE_ONE)){
+      if(countQueuesMode.equals(CountQueuesMode.MODE_ONE)){
         SendMessageCommand sendMessageCommand = createSendMessageCommand(queues, answer);
         synchronized (handlesTimesExecutorsMap){
           if(handlesTimesExecutorsMap.containsKey(sendMessageCommand.getDateSend())){
@@ -105,9 +107,7 @@ public class SendMessageExecutor implements CommandSetExecutor{
       }
 
     } else if(answer instanceof ClientListAnswer){
-      synchronized (clients){
-        clients = ((ClientListAnswer) answer).getClients();
-      }
+      clients = ((ClientListAnswer) answer).getClients();
       QueueListCommand command = createQueueListCommand(answer);
       synchronized (handlesTimesExecutorsMap){
         if(handlesTimesExecutorsMap.containsKey(command.getDateSend())){
@@ -150,9 +150,9 @@ public class SendMessageExecutor implements CommandSetExecutor{
 
   private SendMessageCommand createSendMessageCommand(List<Queue> queues, Answer answer){
     String text = "";
-    if(sizeMessageMode.equals(SendBroadcastExecutor.SizeMessageMode.MODE_BIG)){
+    if(sizeMessageMode.equals(SizeMessageMode.MODE_BIG)){
       text = StringGenerator.generate(2000);
-    } else if(sizeMessageMode.equals(SendBroadcastExecutor.SizeMessageMode.MODE_SMALL)){
+    } else if(sizeMessageMode.equals(SizeMessageMode.MODE_SMALL)){
       text = StringGenerator.generate(200);
     }
 

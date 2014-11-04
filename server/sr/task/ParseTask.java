@@ -1,6 +1,7 @@
 package sr.task;
 
 import cn.command.*;
+import cn.model.Client;
 import sr.context.AppContext;
 
 import java.nio.ByteBuffer;
@@ -40,6 +41,8 @@ public class ParseTask implements Runnable {
             getExecutor().execute(new CreateQueueTask((CreateQueueCommand) command, clientChanel));
           } else if(command instanceof  QueueListCommand){
             getExecutor().execute(new GetQueueListTask((QueueListCommand) command, clientChanel));
+          } else if(command instanceof ClientListCommand){
+            getExecutor().execute(new GetClientListTask((ClientListCommand) command, clientChanel));
           } else if(command instanceof RegisterClientCommand){
             getExecutor().execute(new RegisterClientTask((RegisterClientCommand) command, clientChanel));
           } else if(command instanceof  SendMessageCommand){
@@ -80,6 +83,9 @@ public class ParseTask implements Runnable {
     } else if (Command.QUEUE_LIST.equals(type)){
       buffer.delete(start, end);
       return parseQueueListCommand(cmd);
+    } else if (Command.CLIENT_LIST.equals(type)){
+      buffer.delete(start, end);
+      return parseClientListCommand(cmd);
     } else if (Command.REGISTER_CLIENT.equals(type)){
       buffer.delete(start, end);
       return parseRegisterClientCommand(cmd);
@@ -120,6 +126,17 @@ public class ParseTask implements Runnable {
       return command;
     } catch (Exception e){
       logger.log(Level.SEVERE, "Error parse QueueListCommand" , e);
+    }
+    return null;
+  }
+
+  private ClientListCommand parseClientListCommand(String data){
+    try{
+      ClientListCommand command = new ClientListCommand();
+      parseCommonFields(command, data);
+      return command;
+    } catch (Exception e){
+      logger.log(Level.SEVERE, "Error parse ClientListCommand" , e);
     }
     return null;
   }

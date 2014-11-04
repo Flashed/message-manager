@@ -1,6 +1,7 @@
 package read;
 
 import cn.answer.*;
+import cn.model.Client;
 import cn.model.Queue;
 
 import java.nio.ByteBuffer;
@@ -86,11 +87,16 @@ public class TaskRead implements Runnable{
     } if(Answer.QUEUES_LIST.equals(type)){
       charBuffer.delete(start, end+6);
       return parseQueueListAnswer(answer);
-    } if(Answer.MESSAGE.equals(type)){
+    } if(Answer.CLIENTS_LIST.equals(type)){
+      charBuffer.delete(start, end+6);
+      return parseClientListAnswer(answer);
+    }
+    if(Answer.MESSAGE.equals(type)){
       charBuffer.delete(start, end+6);
       return parseMessageAnswer(answer);
     }
     logger.warning("Answer type not found");
+    charBuffer.setLength(0);
     return null;
   }
 
@@ -143,6 +149,36 @@ public class TaskRead implements Runnable{
     return null;
   }
 
+  private ClientListAnswer parseClientListAnswer(String data){
+    try{
+
+      String ids = data.substring(data.indexOf("<ids>") + 5);
+      ids = ids.substring(0, ids.indexOf("</ids>"));
+
+      List<Client> clients = new ArrayList<>();
+
+      String id;
+      try {
+        while(true){
+          id= ids.substring(ids.indexOf("<id>") + 4, ids.indexOf("</id>"));
+          ids = ids.substring(ids.indexOf("</id>") + 5, ids.length() );
+          Client client = new Client();
+          client.setId(Integer.valueOf(id));
+          clients.add(client);
+        }
+      } catch (IndexOutOfBoundsException ignore){}
+
+      ClientListAnswer answer = new ClientListAnswer();
+      answer.setClients(clients);
+      parseCommonFields(answer, data);
+      logger.info("");
+      return answer;
+
+    }catch (Exception e){
+      logger.log(Level.SEVERE, "Error parse ClientListAnswer" , e);
+    }
+    return null;
+  }
 
   private SuccessAnswer parseSuccessAnswer(String data){
     try{
