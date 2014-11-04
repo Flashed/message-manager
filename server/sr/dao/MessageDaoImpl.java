@@ -100,8 +100,45 @@ public class MessageDaoImpl implements MessageDao{
       throw wrap;
 
     }
+    return null;
+  }
 
-    logger.log(Level.SEVERE, "selected message is null");
+  @Override
+  public Message last(int queueId, int receiverId, int senderId) {
+
+    String sql = "select * from messages where queueId=? and receiverId=? and senderId=? order by id asc limit 1";
+
+    try (
+            Connection connection = getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+    ) {
+
+      statement.setInt(1, queueId);
+      statement.setInt(2, receiverId);
+      statement.setInt(3, senderId);
+      ResultSet resultSet = statement.executeQuery();
+      if (resultSet.next()){
+        Message message = new Message();
+        message.setText(resultSet.getString("mess_text"));
+        message.setId(resultSet.getInt("id"));
+        message.setQueueId(resultSet.getInt("queueid"));
+        message.setSenderId(resultSet.getInt("senderid"));
+        message.setReceiverId(resultSet.getInt("receiverid"));
+
+        resultSet.close();
+        statement.close();
+        connection.close();
+        return message;
+      }
+      resultSet.close();
+      statement.close();
+      connection.close();
+    } catch (Exception e) {
+      RuntimeException wrap = new RuntimeException("Error last message", e);
+      logger.log(Level.SEVERE, "", e);
+      throw wrap;
+
+    }
     return null;
   }
 

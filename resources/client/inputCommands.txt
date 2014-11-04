@@ -9,6 +9,11 @@ send_small_message_to_several 4
 send_big_message_to_one 5
 send_big_message_to_several 6
 get_message 20
+get_and_delete_message 20
 get_broadcast_message 15
+get_and_delete_broadcast_message 15
+get_message_from_sender 5
+get_and_delete_message_from_sender 5
+get_message 5
 
 

@@ -35,7 +35,6 @@ public class SendMessageExecutor implements CommandSetExecutor{
 
   private StatisticService statisticService;
 
-
   private CountQueuesMode countQueuesMode;
 
   private SizeMessageMode sizeMessageMode;

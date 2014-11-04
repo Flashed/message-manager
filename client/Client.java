@@ -148,13 +148,36 @@ public class Client implements CommandSetStarterListener, ReadListener {
     setExecutorsMap.put(CommandSet.TYPE_SEND_BIG_MESSAGE_TO_SEVERAL,sendMessageExecutor4);
 
 
-    GetBroadcastMessageExecutor getBroadcastMessageExecutor = new GetBroadcastMessageExecutor(socketChannel, statisticService, clientId);
-    getBroadcastMessageExecutor.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
-    setExecutorsMap.put(CommandSet.TYPE_GET_BROADCAST_MESSAGE, getBroadcastMessageExecutor);
+    GetBroadcastMessageExecutor getBroadcastMessageExecutor1 = new GetBroadcastMessageExecutor(socketChannel, statisticService,
+            clientId, CommandSet.TYPE_GET_BROADCAST_MESSAGE);
+    getBroadcastMessageExecutor1.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
+    setExecutorsMap.put(CommandSet.TYPE_GET_BROADCAST_MESSAGE, getBroadcastMessageExecutor1);
 
-    GetMessageExecutor getMessageExecutor = new GetMessageExecutor(socketChannel, statisticService, clientId);
-    getMessageExecutor.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
-    setExecutorsMap.put(CommandSet.TYPE_GET_MESSAGE, getMessageExecutor);
+    GetBroadcastMessageExecutor getBroadcastMessageExecutor2 = new GetBroadcastMessageExecutor(socketChannel, statisticService,
+            clientId, CommandSet.TYPE_GET_AND_DELETE_BROADCAST_MESSAGE);
+    getBroadcastMessageExecutor2.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
+    setExecutorsMap.put(CommandSet.TYPE_GET_AND_DELETE_BROADCAST_MESSAGE, getBroadcastMessageExecutor2);
+
+    GetMessageExecutor getMessageExecutor1 = new GetMessageExecutor(socketChannel, statisticService, clientId,
+            CommandSet.TYPE_GET_MESSAGE);
+    getMessageExecutor1.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
+    setExecutorsMap.put(CommandSet.TYPE_GET_MESSAGE, getMessageExecutor1);
+
+    GetMessageExecutor getMessageExecutor2 = new GetMessageExecutor(socketChannel, statisticService, clientId,
+            CommandSet.TYPE_GET_AND_DELETE_MESSAGE);
+    getMessageExecutor2.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
+    setExecutorsMap.put(CommandSet.TYPE_GET_AND_DELETE_MESSAGE, getMessageExecutor2);
+
+    GetMessageExecutor getMessageExecutor3 = new GetMessageExecutor(socketChannel, statisticService, clientId,
+            CommandSet.TYPE_GET_MESSAGE_FROM_SENDER);
+    getMessageExecutor3.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
+    setExecutorsMap.put(CommandSet.TYPE_GET_MESSAGE_FROM_SENDER, getMessageExecutor3);
+
+    GetMessageExecutor getMessageExecutor4 = new GetMessageExecutor(socketChannel, statisticService, clientId,
+            CommandSet.TYPE_GET_AND_DELETE_MESSAGE_FROM_SENDER);
+    getMessageExecutor4.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
+    setExecutorsMap.put(CommandSet.TYPE_GET_AND_DELETE_MESSAGE_FROM_SENDER, getMessageExecutor4);
+
 
     CommandSetStarter commandGenerator = new CommandSetStarter(timeoutExec, this);
     commandGenerator.start();

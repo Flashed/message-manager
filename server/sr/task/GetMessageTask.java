@@ -40,8 +40,13 @@ public class GetMessageTask implements Runnable{
       Object guard = getGuard();
       synchronized (guard) {
         MessageDao messageDao = getMessageDao();
-        message = messageDao.last(command.getQueueId(), command.getClientId());
-        if(message != null){
+        if(command.getSenderId() == -1){
+          message = messageDao.last(command.getQueueId(), command.getClientId());
+        } else{
+          message = messageDao.last(command.getQueueId(), command.getClientId(), command.getSenderId());
+        }
+
+        if(message != null && command.isDelete()){
           messageDao.delete(message);
         }
         endExecSqlTime = System.currentTimeMillis() - startExecTime;

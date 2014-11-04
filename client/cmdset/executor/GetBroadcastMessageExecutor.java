@@ -27,7 +27,7 @@ public class GetBroadcastMessageExecutor implements CommandSetExecutor {
 
   private Map<Long, CommandSetExecutor> handlesTimesExecutorsMap;
 
-  private String commandSetType = CommandSet.TYPE_GET_BROADCAST_MESSAGE;
+  private String commandSetType;
 
   private SocketChannel socketChannel;
 
@@ -35,10 +35,12 @@ public class GetBroadcastMessageExecutor implements CommandSetExecutor {
 
   private int clientId;
 
-  public GetBroadcastMessageExecutor(SocketChannel socketChannel, StatisticService statisticService, int clientId) {
+  public GetBroadcastMessageExecutor(SocketChannel socketChannel, StatisticService statisticService, int clientId,
+                                     String commandSetType) {
     this.socketChannel = socketChannel;
     this.statisticService = statisticService;
     this.clientId = clientId;
+    this.commandSetType = commandSetType;
   }
 
   @Override
@@ -100,6 +102,9 @@ public class GetBroadcastMessageExecutor implements CommandSetExecutor {
     GetMeMessageCommand command = new GetMeMessageCommand();
     command.setCommandSetId(answer.getCommandSetId());
     command.setClientId(-1);
+    if(CommandSet.TYPE_GET_AND_DELETE_BROADCAST_MESSAGE.equals(commandSetType)){
+      command.setDelete(true);
+    }
 
     double id;
     Queue queue;

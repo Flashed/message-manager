@@ -14,4 +14,6 @@ public interface MessageDao {
   void delete(Message message);
 
   Message last(int queueId, int receiverId);
+
+  Message last(int queueId, int receiverId, int senderId);
 }

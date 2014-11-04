@@ -104,10 +104,16 @@ public class ParseTask implements Runnable {
 
       String queueId = data.substring(data.indexOf("<queueId>") + 9);
       queueId = queueId.substring(0, queueId.indexOf("</queueId>"));
+      String senderId = data.substring(data.indexOf("<senderId>") + 10);
+      senderId = senderId.substring(0, senderId.indexOf("</senderId>"));
+      String delete = data.substring(data.indexOf("<delete>") + 8);
+      delete = delete.substring(0, delete.indexOf("</delete>"));
 
       GetMeMessageCommand command = new GetMeMessageCommand();
       command.setType(Command.GET_ME_MESSAGE);
       command.setQueueId(Integer.valueOf(queueId));
+      command.setDelete(Boolean.valueOf(delete));
+      command.setSenderId(Integer.valueOf(senderId));
 
       parseCommonFields(command, data);
 
