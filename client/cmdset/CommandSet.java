@@ -13,6 +13,9 @@ public class CommandSet {
   public static final String TYPE_SEND_BIG_BROADCAST_TO_SEVERAL = "send_big_broadcast_to_several";
   public static final String TYPE_GET_BROADCAST_MESSAGE = "get_broadcast_message";
 
+
+
+
   private String type;
 
   private int execCount;

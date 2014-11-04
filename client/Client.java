@@ -3,6 +3,7 @@ import cmdset.CommandSetStarter;
 import cmdset.CommandSetStarterListener;
 import cmdset.executor.*;
 import cn.answer.Answer;
+import cn.command.SendMessageCommand;
 import read.ReadListener;
 import read.TaskRead;
 import statistic.StatisticService;
@@ -112,6 +113,8 @@ public class Client implements CommandSetStarterListener, ReadListener {
     GetBroadcastMessageExecutor getBroadcastMessageExecutor = new GetBroadcastMessageExecutor(socketChannel, statisticService, clientId);
     getBroadcastMessageExecutor.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
     setExecutorsMap.put(CommandSet.TYPE_GET_BROADCAST_MESSAGE, getBroadcastMessageExecutor);
+
+
 
     CommandSetStarter commandGenerator = new CommandSetStarter(timeoutExec, this);
     commandGenerator.start();

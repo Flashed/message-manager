@@ -66,9 +66,9 @@ public class MessageDaoImpl implements MessageDao{
   }
 
   @Override
-  public Message get(int queueId, int receiverId) {
+  public Message last(int queueId, int receiverId) {
 
-    String sql = "select * from messages where queueId=? and receiverId=? limit 1";
+    String sql = "select * from messages where queueId=? and receiverId=? order by id asc limit 1";
 
     try (
             Connection connection = getConnection();
@@ -95,7 +95,7 @@ public class MessageDaoImpl implements MessageDao{
       statement.close();
       connection.close();
     } catch (Exception e) {
-      RuntimeException wrap = new RuntimeException("Error get message", e);
+      RuntimeException wrap = new RuntimeException("Error last message", e);
       logger.log(Level.SEVERE, "", e);
       throw wrap;
 
@@ -103,67 +103,6 @@ public class MessageDaoImpl implements MessageDao{
 
     logger.log(Level.SEVERE, "selected message is null");
     return null;
-  }
-
-  @Override
-  public Message get(int queueId, int receiverId, Connection connection) {
-    String sql = "select * from messages where queueId=? and receiverId=? limit 1";
-
-    try (
-            PreparedStatement statement = connection.prepareStatement(sql);
-    ) {
-
-      statement.setInt(1, queueId);
-      statement.setInt(2, receiverId);
-      ResultSet resultSet = statement.executeQuery();
-      if (resultSet.next()){
-        Message message = new Message();
-        message.setText(resultSet.getString("mess_text"));
-        message.setId(resultSet.getInt("id"));
-        message.setQueueId(resultSet.getInt("queueid"));
-        message.setSenderId(resultSet.getInt("senderid"));
-        message.setReceiverId(resultSet.getInt("receiverid"));
-
-        resultSet.close();
-        statement.close();
-        connection.close();
-        return message;
-      }
-      resultSet.close();
-      statement.close();
-      connection.close();
-    } catch (Exception e) {
-      RuntimeException wrap = new RuntimeException("Error get message", e);
-      logger.log(Level.SEVERE, "", e);
-      throw wrap;
-
-    }
-
-    logger.log(Level.SEVERE, "selected message is null");
-    return null;
-  }
-
-  private Integer getLastMessageCount(){
-    String sql = "select id from queues order by id desc limit 1";
-    Integer result = 0;
-    try (
-            Connection connection = getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql)
-    ) {
-      ResultSet resultSet = statement.executeQuery();
-      if(resultSet.next()) {
-        result = resultSet.getInt("id");
-      }
-      resultSet.close();
-      statement.close();
-      connection.close();
-    } catch (SQLException e) {
-      RuntimeException wrap = new RuntimeException("Error save queue", e);
-      logger.log(Level.SEVERE, "", e);
-      throw wrap;
-
-    }
-    return result;
   }
 
   private Connection getConnection() throws SQLException {

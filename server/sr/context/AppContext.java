@@ -34,6 +34,8 @@ public class AppContext {
 
   private Map<Channel, StringBuilder> commandBuffers = new HashMap();
 
+  private Object getMessageGuard;
+
   private AppContext() {
 
   }
@@ -49,6 +51,8 @@ public class AppContext {
     poolingDataSource.setDatabaseName(Config.getDBName());
     poolingDataSource.setMaxConnections(Config.getDBConnectionsNumber());
 
+    getMessageGuard = new Object();
+
     clientDao = new ClientDaoImpl();
     queueDao = new QueueDaoImpl();
     messageDao = new MessageDaoImpl();
@@ -57,6 +61,7 @@ public class AppContext {
 
     server = new Server(Config.getPort());
     server.setPoolExecutor(poolExecutor);
+
 
   }
 
@@ -100,4 +105,11 @@ public class AppContext {
     return messageDao;
   }
 
+  public Object getGetMessageGuard() {
+    return getMessageGuard;
+  }
+
+  public void setGetMessageGuard(Object getMessageGuard) {
+    this.getMessageGuard = getMessageGuard;
+  }
 }

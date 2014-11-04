@@ -35,33 +35,35 @@ public class GetMessageTask implements Runnable{
   public void run() {
     long startExecTime = System.currentTimeMillis();
     try{
-      MessageDao messageDao = getMessageDao();
-      Message message = messageDao.get(command.getQueueId(), command.getClientId());
-      long endExecSqlTime = System.currentTimeMillis() - startExecTime;
-      if(message != null){
+      Message message;
+      long endExecSqlTime;
+      Object guard = getGuard();
+      synchronized (guard) {
+        MessageDao messageDao = getMessageDao();
+        message = messageDao.last(command.getQueueId(), command.getClientId());
         messageDao.delete(message);
         endExecSqlTime = System.currentTimeMillis() - startExecTime;
-        synchronized (clientChannel) {
-          MessageAnswer answer = new MessageAnswer();
-          answer.setText(message.getText());
-          answer.setCommandSetId(command.getCommandSetId());
-          answer.setMessageId(message.getId());
-          Answer.setTimeToAnswer(command, answer, startExecTime, endExecSqlTime);
-          clientChannel.write(ByteBuffer.wrap(
-                  answer.toString().getBytes()));
-          logger.info("Send " + message);
-        }
-      } else {
-        synchronized (clientChannel) {
-          Answer answer = new SuccessAnswer("Messages not found");
-          answer.setCommandSetId(command.getCommandSetId());
-          Answer.setTimeToAnswer(command, answer, startExecTime, endExecSqlTime);
-          clientChannel.write(ByteBuffer.wrap(
-                  answer.toString().getBytes()));
+      }
+      if (message != null) {
+          synchronized (clientChannel) {
+            MessageAnswer answer = new MessageAnswer();
+            answer.setText(message.getText());
+            answer.setCommandSetId(command.getCommandSetId());
+            answer.setMessageId(message.getId());
+            Answer.setTimeToAnswer(command, answer, startExecTime, endExecSqlTime);
+            clientChannel.write(ByteBuffer.wrap(
+                    answer.toString().getBytes()));
+            logger.info("Send " + message);
+          }
+        } else {
+          synchronized (clientChannel) {
+            Answer answer = new SuccessAnswer("Messages not found");
+            answer.setCommandSetId(command.getCommandSetId());
+            Answer.setTimeToAnswer(command, answer, startExecTime, endExecSqlTime);
+            clientChannel.write(ByteBuffer.wrap(
+                    answer.toString().getBytes()));
         }
       }
-
-
     } catch (Exception e){
       logger.log(Level.SEVERE, "Failed to get message", e);
       try {
@@ -80,5 +82,9 @@ public class GetMessageTask implements Runnable{
 
   private MessageDao getMessageDao(){
     return AppContext.getAppContext().getMessageDao();
+  }
+
+  private Object getGuard(){
+    return AppContext.getAppContext().getGetMessageGuard();
   }
 }
