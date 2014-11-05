@@ -40,6 +40,14 @@ public class Config {
     }
   }
 
+  public static String getStatisticFolder(){
+    try{
+      return getProp("client.statistic_folder");
+    } catch (Exception e){
+      return "";
+    }
+  }
+
   public static int getClientId(){
     try{
       return Integer.valueOf(getProp("client.id"));

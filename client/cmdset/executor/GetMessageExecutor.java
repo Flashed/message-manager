@@ -58,10 +58,10 @@ public class GetMessageExecutor implements CommandSetExecutor {
       command = createQueueListCommand(commandSet);
     }
     synchronized (handlesTimesExecutorsMap) {
-      if (handlesTimesExecutorsMap.containsKey(command.getDateSend())) {
+      if (handlesTimesExecutorsMap.containsKey(command.getCommandId())) {
         logger.log(Level.SEVERE, "handlesTimesExecutorsMap already contains key");
       }
-      handlesTimesExecutorsMap.put(command.getDateSend(), this);
+      handlesTimesExecutorsMap.put(command.getCommandId(), this);
       sendCommand(command);
     }
   }
@@ -73,10 +73,10 @@ public class GetMessageExecutor implements CommandSetExecutor {
       clients = ((ClientListAnswer) answer).getClients();
       QueueListCommand command = createQueueListCommand(answer);
       synchronized (handlesTimesExecutorsMap) {
-        if (handlesTimesExecutorsMap.containsKey(command.getDateSend())) {
+        if (handlesTimesExecutorsMap.containsKey(command.getCommandId())) {
           logger.log(Level.SEVERE, "handlesTimesExecutorsMap already contains key");
         }
-        handlesTimesExecutorsMap.put(command.getDateSend(), this);
+        handlesTimesExecutorsMap.put(command.getCommandId(), this);
       }
       sendCommand(command);
     } else if (answer instanceof QueueListAnswer) {
@@ -87,10 +87,10 @@ public class GetMessageExecutor implements CommandSetExecutor {
       }
       GetMeMessageCommand command = createGetMeMessageCommand(queues, answer);
       synchronized (handlesTimesExecutorsMap) {
-        if (handlesTimesExecutorsMap.containsKey(command.getDateSend())) {
+        if (handlesTimesExecutorsMap.containsKey(command.getCommandId())) {
           logger.log(Level.SEVERE, "handlesTimesExecutorsMap already contains key");
         }
-        handlesTimesExecutorsMap.put(command.getDateSend(), this);
+        handlesTimesExecutorsMap.put(command.getCommandId(), this);
       }
       sendCommand(command);
     } else if (answer instanceof MessageAnswer) {
@@ -114,7 +114,8 @@ public class GetMessageExecutor implements CommandSetExecutor {
   private ClientListCommand createClientListCommand(CommandSet commandSet) {
     ClientListCommand command = new ClientListCommand();
     command.setCommandSetId(commandSet.getId());
-    command.setDateSend(System.nanoTime());
+    command.setCommandId(System.nanoTime());
+    command.setDateSend(System.currentTimeMillis());
     return command;
   }
 
@@ -122,7 +123,8 @@ public class GetMessageExecutor implements CommandSetExecutor {
     QueueListCommand command = new QueueListCommand();
     command.setCommandSetId(commandSet.getId());
     command.setClientId(clientId);
-    command.setDateSend(System.nanoTime());
+    command.setCommandId(System.nanoTime());
+    command.setDateSend(System.currentTimeMillis());
     return command;
   }
 
@@ -130,7 +132,8 @@ public class GetMessageExecutor implements CommandSetExecutor {
     QueueListCommand command = new QueueListCommand();
     command.setCommandSetId(answer.getCommandSetId());
     command.setClientId(clientId);
-    command.setDateSend(System.nanoTime());
+    command.setCommandId(System.nanoTime());
+    command.setDateSend(System.currentTimeMillis());
     return command;
   }
 
@@ -159,7 +162,8 @@ public class GetMessageExecutor implements CommandSetExecutor {
       }
     }
 
-    command.setDateSend(System.nanoTime());
+    command.setCommandId(System.nanoTime());
+    command.setDateSend(System.currentTimeMillis());
 
     return command;
   }

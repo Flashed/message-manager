@@ -37,11 +37,11 @@ public class ClientListAnswer extends Answer{
     return "<ans>\n" +
             "    <type>"+ getType() +"</type>\n" +
             "    <mes>"+getMessage()+"</mes>\n" +
-            "    <dateSend>"+getDateSend()+"</dateSend>\n" +
+            "    <commandId>"+ getCommandId()+"</commandId>\n" +
             "    <timeOfReceiptServer>"+getTimeOfReceiptServer()+"</timeOfReceiptServer>\n" +
             "    <timeOfExecSql>"+getTimeOfExecSql()+"</timeOfExecSql>\n" +
             "    <timeOfExecuteServer>"+getTimeOfExecuteServer()+"</timeOfExecuteServer>\n" +
-            "    <dateAnswer>"+getDateAnswer()+"</dateAnswer>\n" +
+            "    <dateSend>"+getDateSend()+"</dateSend>\n" +
             "    <dateAnswer>"+getDateAnswer()+"</dateAnswer>\n" +
             "    <commandSetId>"+getCommandSetId()+"</commandSetId>\n" +
             "    <ids>\n" +

@@ -5,7 +5,6 @@ import cmdset.executor.*;
 import cmdset.executor.params.CountQueuesMode;
 import cmdset.executor.params.SizeMessageMode;
 import cn.answer.Answer;
-import cn.command.SendMessageCommand;
 import read.ReadListener;
 import read.TaskRead;
 import statistic.StatisticService;
@@ -15,9 +14,7 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -46,12 +43,14 @@ public class Client implements CommandSetStarterListener, ReadListener {
 
   private int clientId;
 
+  private String statisticFolder;
 
-  public Client(String host, int port, long timeoutExec, int clientId) {
+  public Client(String host, int port, long timeoutExec, int clientId, String statisticFolder) {
     this.host = host;
     this.port = port;
     this.timeoutExec = timeoutExec;
     this.clientId = clientId;
+    this.statisticFolder = statisticFolder;
   }
 
   public void connect(){
@@ -70,7 +69,9 @@ public class Client implements CommandSetStarterListener, ReadListener {
 
   private void startExecutor(){
     statisticService = new StatisticService();
+    statisticService.setFolder(statisticFolder);
     statisticService.setClientId(clientId);
+    statisticService.init();
 
     CreateQueueExecutor createQueueExecutor = new CreateQueueExecutor(socketChannel, statisticService);
     createQueueExecutor.setHandlesTimesExecutorsMap(handlesTimesExecutorsMap);
@@ -200,9 +201,9 @@ public class Client implements CommandSetStarterListener, ReadListener {
   public void onReadAnswer(Answer answer) {
     synchronized (handlesTimesExecutorsMap){
       Collection<Long> keys = handlesTimesExecutorsMap.keySet();
-      logger.fine("keys " + keys + "\n answer key " + answer.getDateSend());
-      if(handlesTimesExecutorsMap.containsKey(answer.getDateSend())){
-        handlesTimesExecutorsMap.remove(answer.getDateSend()).handleAnswer(answer);
+      logger.fine("keys " + keys + "\n answer key " + answer.getCommandId());
+      if(handlesTimesExecutorsMap.containsKey(answer.getCommandId())){
+        handlesTimesExecutorsMap.remove(answer.getCommandId()).handleAnswer(answer);
       }
     }
   }
@@ -220,7 +221,8 @@ public class Client implements CommandSetStarterListener, ReadListener {
     Client client = new Client(Config.getServerHost(),
             Config.getServerPort(),
             Config.getExecTimeout(),
-            Config.getClientId());
+            Config.getClientId(),
+            Config.getStatisticFolder());
     client.connect();
   }
 }

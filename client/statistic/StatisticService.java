@@ -4,6 +4,7 @@ import cn.answer.Answer;
 
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,25 +18,38 @@ public class StatisticService {
 
   private static final Logger logger = Logger.getLogger(StatisticService.class.getName());
 
+  private static final String STATISTIC_FORMAT = "%12s\t\t%31s\t\t%10s\t\t%28s\t\t%19s\t\t%14s\t\t%19s\t\t%19s\r\n";
+
+  private static final String DATE_FORMAT = "YYYY-MM-dd HH:mm:ss.SSS";
+
+  private SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_FORMAT);
+
   private List<String> outList = new ArrayList<>();
 
-  private String fileName = "./logs/statistic.txt";
+  private String fileName;
 
-  private long lastOutTime;
+  private String folder;
 
   private int clientId;
 
   public StatisticService() {
+
+  }
+
+  public void init(){
     try {
-      FileWriter statisticFile = new FileWriter(fileName, true);
-      statisticFile.write(String.format("%12s\t\t%31s\t\t%10s\t\t%28s\t\t%19s\t\t%14s\t\t%19s\r\n",
+      fileName = "/statistic_"+ clientId +".txt";
+      FileWriter statisticFile = new FileWriter(folder + fileName, true);
+      statisticFile.write(String.format(STATISTIC_FORMAT,
               "clientId",
               "commandSetType",
               "answerType",
               "dateSend",
               "timeOfReceiptServer",
               "timeOfExecSql",
-              "timeOfExecuteServer"));
+              "timeOfReceiptClient",
+              "timeOfExecuteServer"
+              ));
       statisticFile.flush();
       statisticFile.close();
 
@@ -48,12 +62,10 @@ public class StatisticService {
             } catch (InterruptedException e) {
               e.printStackTrace();
             }
-              writeToFile();
+            writeToFile();
           }
         }
       }).start();
-
-      lastOutTime = System.currentTimeMillis();
     } catch (Exception e){
       logger.log(Level.SEVERE, "Failed to open statistic file");
     }
@@ -61,13 +73,14 @@ public class StatisticService {
 
   public void write(String commandSetType ,Answer answer){
     try {
-      outList.add(String.format("%12s\t\t%31s\t\t%10s\t\t%28s\t\t%19s\t\t%14s\t\t%19s\n",
+      outList.add(String.format(STATISTIC_FORMAT,
               clientId,
               commandSetType,
               answer.getType(),
-              new Date(answer.getDateSend()),
+              simpleDateFormat.format(new Date(answer.getDateSend())),
               answer.getTimeOfReceiptServer(),
               answer.getTimeOfExecSql(),
+              answer.getTimeOfReceiptClient(),
               answer.getTimeOfExecuteServer()));
     }catch (Exception e){
       logger.log(Level.SEVERE, "Failed to write statistic");
@@ -78,15 +91,14 @@ public class StatisticService {
     try {
       synchronized (outList){
         if(!outList.isEmpty() ){
-          FileWriter writer = new FileWriter(fileName,true);
+          FileWriter writer = new FileWriter(folder+fileName,true);
           for(String s :outList){
             writer.write(s);
           }
           writer.flush();
           writer.close();
           outList.clear();
-          lastOutTime = System.currentTimeMillis();
-          logger.info("Write statistic to " + fileName);
+          logger.info("Write statistic to " + folder+fileName);
         }
       }
     } catch (Exception e){
@@ -97,5 +109,9 @@ public class StatisticService {
 
   public void setClientId(int clientId) {
     this.clientId = clientId;
+  }
+
+  public void setFolder(String folder) {
+    this.folder = folder;
   }
 }

@@ -49,9 +49,10 @@ public class GetMeMessageCommand extends Command{
             "    <clientId>"+ getClientId() +"</clientId>\n" +
             "    <senderId>"+ getSenderId() +"</senderId>\n" +
             "    <queueId>"+ getQueueId() +"</queueId>\n" +
-            "    <dateSend>"+ getDateSend() +"</dateSend>\n" +
+            "    <commandId>"+ getCommandId() +"</commandId>\n" +
             "    <delete>"+ isDelete() +"</delete>\n" +
             "    <commandSetId>"+ getCommandSetId() +"</commandSetId>\n" +
+            "    <dateSend>"+getDateSend()+"</dateSend>\n" +
             "</cmd>";
   }
 }

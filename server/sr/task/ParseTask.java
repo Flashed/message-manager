@@ -1,7 +1,6 @@
 package sr.task;
 
 import cn.command.*;
-import cn.model.Client;
 import sr.context.AppContext;
 
 import java.nio.ByteBuffer;
@@ -209,12 +208,15 @@ public class ParseTask implements Runnable {
   private void parseCommonFields(Command command, String data){
     String clientId = data.substring(data.indexOf("<clientId>") + 10);
     clientId = clientId.substring(0, clientId.indexOf("</clientId>"));
+    String commandId = data.substring(data.indexOf("<commandId>") + 11);
+    commandId = commandId.substring(0, commandId.indexOf("</commandId>"));
     String dateSend = data.substring(data.indexOf("<dateSend>") + 10);
     dateSend = dateSend.substring(0, dateSend.indexOf("</dateSend>"));
     String commandSetId = data.substring(data.indexOf("<commandSetId>") + 14);
     commandSetId = commandSetId.substring(0, commandSetId.indexOf("</commandSetId>"));
 
     command.setClientId(Integer.valueOf(clientId));
+    command.setCommandId(Long.valueOf(commandId));
     command.setDateSend(Long.valueOf(dateSend));
     command.setCommandSetId(Integer.valueOf(commandSetId));
   }

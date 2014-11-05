@@ -2,15 +2,12 @@ package cmdset.executor;
 
 import cmdset.CommandSet;
 import cn.answer.Answer;
-import cn.answer.QueueListAnswer;
 import cn.command.Command;
 import cn.command.CreateQueueCommand;
-import cn.model.Queue;
 import statistic.StatisticService;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,10 +38,10 @@ public class CreateQueueExecutor implements CommandSetExecutor{
     try{
       Command command = createCreateQueueCommand(commandSet);
       synchronized (handlesTimesExecutorsMap){
-        if(handlesTimesExecutorsMap.containsKey(command.getDateSend())){
+        if(handlesTimesExecutorsMap.containsKey(command.getCommandId())){
           logger.log(Level.SEVERE, "handlesTimesExecutorsMap already contains key");
         }
-        handlesTimesExecutorsMap.put(command.getDateSend(), this);
+        handlesTimesExecutorsMap.put(command.getCommandId(), this);
       }
       socketChannel.write(ByteBuffer.wrap(command.toString().getBytes()));
     }catch (Exception e){
@@ -66,7 +63,8 @@ public class CreateQueueExecutor implements CommandSetExecutor{
     CreateQueueCommand cmd = new CreateQueueCommand();
     cmd.setCommandSetId(commandSet.getId());
     cmd.setQueueId((int)(Math.random()*100000));
-    cmd.setDateSend(System.nanoTime());
+    cmd.setCommandId(System.nanoTime());
+    cmd.setDateSend(System.currentTimeMillis());
     return cmd;
   }
 }

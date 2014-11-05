@@ -25,8 +25,9 @@ public class CreateQueueCommand extends Command{
             "    <type>"+ getType() +"</type>\n" +
             "    <clientId>"+ getClientId() +"</clientId>\n" +
             "    <queueId>"+ getQueueId() +"</queueId>\n" +
-            "    <dateSend>"+ getDateSend() +"</dateSend>\n" +
+            "    <commandId>"+ getCommandId() +"</commandId>\n" +
             "    <commandSetId>"+ getCommandSetId() +"</commandSetId>\n" +
+            "    <dateSend>"+getDateSend()+"</dateSend>\n" +
             "</cmd>";
   }
 }

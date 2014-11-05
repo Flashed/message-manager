@@ -15,9 +15,13 @@ public class Answer {
 
   private String type;
 
+  private long commandId;
+
   private long dateSend;
 
   private long timeOfReceiptServer;
+
+  private long timeOfReceiptClient;
 
   private long timeOfExecSql;
 
@@ -43,12 +47,12 @@ public class Answer {
     this.type = type;
   }
 
-  public long getDateSend() {
-    return dateSend;
+  public long getCommandId() {
+    return commandId;
   }
 
-  public void setDateSend(long dateSend) {
-    this.dateSend = dateSend;
+  public void setCommandId(long commandId) {
+    this.commandId = commandId;
   }
 
   public long getTimeOfReceiptServer() {
@@ -91,7 +95,24 @@ public class Answer {
     this.commandSetId = commandSetId;
   }
 
+  public long getTimeOfReceiptClient() {
+    return timeOfReceiptClient;
+  }
+
+  public void setTimeOfReceiptClient(long timeOfReceiptClient) {
+    this.timeOfReceiptClient = timeOfReceiptClient;
+  }
+
+  public long getDateSend() {
+    return dateSend;
+  }
+
+  public void setDateSend(long dateSend) {
+    this.dateSend = dateSend;
+  }
+
   public static void setTimeToAnswer(Command command, Answer answer, long startExecTime, long endExecSqlTime){
+    answer.setCommandId(command.getCommandId());
     answer.setDateSend(command.getDateSend());
     answer.setTimeOfReceiptServer(command.getDateRecipient()-command.getDateSend());
     answer.setTimeOfExecSql(endExecSqlTime);

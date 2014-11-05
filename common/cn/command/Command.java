@@ -17,6 +17,8 @@ public abstract class Command {
 
   private int clientId;
 
+  private long commandId;
+
   private long dateSend;
 
   private long dateRecipient;
@@ -31,12 +33,12 @@ public abstract class Command {
     this.type = type;
   }
 
-  public long getDateSend() {
-    return dateSend;
+  public long getCommandId() {
+    return commandId;
   }
 
-  public void setDateSend(long dateSend) {
-    this.dateSend = dateSend;
+  public void setCommandId(long commandId) {
+    this.commandId = commandId;
   }
 
   public long getDateRecipient() {
@@ -61,5 +63,13 @@ public abstract class Command {
 
   public void setCommandSetId(int commandSetId) {
     this.commandSetId = commandSetId;
+  }
+
+  public long getDateSend() {
+    return dateSend;
+  }
+
+  public void setDateSend(long dateSend) {
+    this.dateSend = dateSend;
   }
 }

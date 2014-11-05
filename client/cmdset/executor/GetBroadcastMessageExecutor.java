@@ -47,10 +47,10 @@ public class GetBroadcastMessageExecutor implements CommandSetExecutor {
   public void execute(CommandSet commandSet) {
     QueueListCommand command = createQueueListCommand(commandSet);
     synchronized (handlesTimesExecutorsMap){
-      if(handlesTimesExecutorsMap.containsKey(command.getDateSend())){
+      if(handlesTimesExecutorsMap.containsKey(command.getCommandId())){
         logger.log(Level.SEVERE, "handlesTimesExecutorsMap already contains key");
       }
-      handlesTimesExecutorsMap.put(command.getDateSend(), this);
+      handlesTimesExecutorsMap.put(command.getCommandId(), this);
       sendCommand(command);
     }
   }
@@ -66,10 +66,10 @@ public class GetBroadcastMessageExecutor implements CommandSetExecutor {
       }
       GetMeMessageCommand command = createGetMeMessageCommand(queues, answer);
       synchronized (handlesTimesExecutorsMap){
-        if(handlesTimesExecutorsMap.containsKey(command.getDateSend())){
+        if(handlesTimesExecutorsMap.containsKey(command.getCommandId())){
           logger.log(Level.SEVERE, "handlesTimesExecutorsMap already contains key");
         }
-        handlesTimesExecutorsMap.put(command.getDateSend(), this);
+        handlesTimesExecutorsMap.put(command.getCommandId(), this);
       }
       sendCommand(command);
     } else if (answer instanceof MessageAnswer){
@@ -94,7 +94,8 @@ public class GetBroadcastMessageExecutor implements CommandSetExecutor {
     QueueListCommand command = new QueueListCommand();
     command.setCommandSetId(commandSet.getId());
     command.setClientId(clientId);
-    command.setDateSend(System.nanoTime());
+    command.setCommandId(System.nanoTime());
+    command.setDateSend(System.currentTimeMillis());
     return command;
   }
 
@@ -111,7 +112,8 @@ public class GetBroadcastMessageExecutor implements CommandSetExecutor {
     id = Math.random() * (queues.size()-1);
     queue = queues.get((int)id);
     command.setQueueId(queue.getId());
-    command.setDateSend(System.nanoTime());
+    command.setCommandId(System.nanoTime());
+    command.setDateSend(System.currentTimeMillis());
 
     return command;
   }
