@@ -87,8 +87,8 @@ public class Server {
       } catch (Exception e) {
         logger.log(Level.SEVERE, "Error server work", e);
       }
-      logger.info("Application stop.");
     }
+    logger.info("Application stop.");
   }
 
 
@@ -142,7 +142,7 @@ public class Server {
     synchronized (buffer){
       writeToCharBuffer(buffer, readBuffer);
     }
-    poolExecutor.execute(new ParseTask(readBuffer, socketChannel));
+    new ParseTask(readBuffer, socketChannel).run();
     if(logger.isLoggable(Level.FINE)){
       logger.fine("Size of task queue " + poolExecutor.getQueue().size());
     }
