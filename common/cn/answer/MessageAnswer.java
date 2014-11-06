@@ -32,16 +32,8 @@ public class MessageAnswer extends Answer{
   @Override
   public String toString(){
     return "<ans>\n" +
-            "    <type>"+ getType() +"</type>\n" +
-            "    <mes>"+getMessage()+"</mes>\n" +
-            "    <commandId>"+ getCommandId()+"</commandId>\n" +
+            super.toString() +
             "    <text>"+getText()+"</text>\n" +
-            "    <timeOfReceiptServer>"+getTimeOfReceiptServer()+"</timeOfReceiptServer>\n" +
-            "    <timeOfExecSql>"+getTimeOfExecSql()+"</timeOfExecSql>\n" +
-            "    <timeOfExecuteServer>"+getTimeOfExecuteServer()+"</timeOfExecuteServer>\n" +
-            "    <dateSend>"+getDateSend()+"</dateSend>\n" +
-            "    <dateAnswer>"+getDateAnswer()+"</dateAnswer>\n" +
-            "    <commandSetId>"+getCommandSetId()+"</commandSetId>\n" +
             "    <messageId>"+getMessageId()+"</messageId>\n" +
             "</ans>";
   }

@@ -45,14 +45,10 @@ public class GetMeMessageCommand extends Command{
   @Override
   public String toString(){
     return "<cmd>\n" +
-            "    <type>"+ getType() +"</type>\n" +
-            "    <clientId>"+ getClientId() +"</clientId>\n" +
+            super.toString() +
             "    <senderId>"+ getSenderId() +"</senderId>\n" +
             "    <queueId>"+ getQueueId() +"</queueId>\n" +
-            "    <commandId>"+ getCommandId() +"</commandId>\n" +
             "    <delete>"+ isDelete() +"</delete>\n" +
-            "    <commandSetId>"+ getCommandSetId() +"</commandSetId>\n" +
-            "    <dateSend>"+getDateSend()+"</dateSend>\n" +
             "</cmd>";
   }
 }

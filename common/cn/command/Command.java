@@ -21,8 +21,6 @@ public abstract class Command {
 
   private long dateSend;
 
-  private long dateRecipient;
-
   private int commandSetId;
 
   public String getType() {
@@ -41,20 +39,12 @@ public abstract class Command {
     this.commandId = commandId;
   }
 
-  public long getDateRecipient() {
-    return dateRecipient;
-  }
-
   public int getClientId() {
     return clientId;
   }
 
   public void setClientId(int clientId) {
     this.clientId = clientId;
-  }
-
-  public void setDateRecipient(long dateRecipient) {
-    this.dateRecipient = dateRecipient;
   }
 
   public int getCommandSetId() {
@@ -71,5 +61,14 @@ public abstract class Command {
 
   public void setDateSend(long dateSend) {
     this.dateSend = dateSend;
+  }
+
+  @Override
+  public String toString() {
+    return  "    <type>" + getType() + "</type>\n" +
+            "    <clientId>"+ getClientId() +"</clientId>\n" +
+            "    <commandId>"+ getCommandId() +"</commandId>\n" +
+            "    <commandSetId>"+ getCommandSetId() +"</commandSetId>\n" +
+            "    <dateSend>"+getDateSend()+"</dateSend>\n" ;
   }
 }

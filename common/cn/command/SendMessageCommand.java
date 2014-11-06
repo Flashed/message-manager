@@ -43,14 +43,10 @@ public class SendMessageCommand extends Command{
   @Override
   public String toString() {
     return "<cmd>\n" +
-            "    <type>" + getType() + "</type>\n" +
+            super.toString() +
             "    <recipientId>"+ getRecipientId() +"</recipientId>\n" +
             "    <queueId>"+ getQueueId() +"</queueId>\n" +
-            "    <clientId>"+ getClientId() +"</clientId>\n" +
-            "    <commandId>"+ getCommandId() +"</commandId>\n" +
             "    <text>"+ getText() +"</text>\n" +
-            "    <commandSetId>"+ getCommandSetId() +"</commandSetId>\n" +
-            "    <dateSend>"+getDateSend()+"</dateSend>\n" +
             "</cmd>";
   }
 }

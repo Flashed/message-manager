@@ -45,6 +45,7 @@ public class TaskRead implements Runnable{
           if(readListener != null){
             try{
               Answer answer = parseAnswer();
+
               readListener.onReadAnswer(answer);
             } catch (Exception e){
               logger.log(Level.SEVERE, "Failed to read answer \n " + new String(readBuffer.array()) , e);
@@ -171,7 +172,6 @@ public class TaskRead implements Runnable{
       ClientListAnswer answer = new ClientListAnswer();
       answer.setClients(clients);
       parseCommonFields(answer, data);
-      logger.info("");
       return answer;
 
     }catch (Exception e){
@@ -210,14 +210,10 @@ public class TaskRead implements Runnable{
     mes = mes.substring(0, mes.indexOf("</mes>"));
     String commandId = data.substring(data.indexOf("<commandId>") + 11);
     commandId = commandId.substring(0, commandId.indexOf("</commandId>"));
-    String timeOfReceiptServer = data.substring(data.indexOf("<timeOfReceiptServer>") + 21);
-    timeOfReceiptServer = timeOfReceiptServer.substring(0, timeOfReceiptServer.indexOf("</timeOfReceiptServer>"));
     String timeOfExecSql = data.substring(data.indexOf("<timeOfExecSql>") + 15);
     timeOfExecSql = timeOfExecSql.substring(0, timeOfExecSql.indexOf("</timeOfExecSql>"));
     String timeOfExecuteServer = data.substring(data.indexOf("<timeOfExecuteServer>") + 21);
     timeOfExecuteServer = timeOfExecuteServer.substring(0, timeOfExecuteServer.indexOf("</timeOfExecuteServer>"));
-    String dateAnswer = data.substring(data.indexOf("<dateAnswer>") + 12);
-    dateAnswer = dateAnswer.substring(0, dateAnswer.indexOf("</dateAnswer>"));
     String dateSend = data.substring(data.indexOf("<dateSend>") + 10);
     dateSend = dateSend.substring(0, dateSend.indexOf("</dateSend>"));
     String commandSetId = data.substring(data.indexOf("<commandSetId>") + 14);
@@ -226,12 +222,11 @@ public class TaskRead implements Runnable{
     answer.setMessage(mes);
     answer.setCommandId(Long.valueOf(commandId));
     answer.setDateSend(Long.valueOf(dateSend));
-    answer.setTimeOfReceiptServer(Long.valueOf(timeOfReceiptServer));
     answer.setTimeOfExecSql(Long.valueOf(timeOfExecSql));
     answer.setTimeOfExecuteServer(Long.valueOf(timeOfExecuteServer));
-    answer.setDateAnswer(Long.valueOf(dateAnswer));
     answer.setCommandSetId(Integer.valueOf(commandSetId));
-    answer.setTimeOfReceiptClient(System.currentTimeMillis() - answer.getDateAnswer());
+
+    Answer.setTimeAllAndNetTransToAnswer(answer);
 
   }
 

@@ -18,7 +18,7 @@ public class StatisticService {
 
   private static final Logger logger = Logger.getLogger(StatisticService.class.getName());
 
-  private static final String STATISTIC_FORMAT = "%12s\t\t%31s\t\t%10s\t\t%28s\t\t%19s\t\t%14s\t\t%19s\t\t%19s\r\n";
+  private static final String STATISTIC_FORMAT = "%12s\t\t%31s\t\t%31s\t\t%28s\t\t%20s\t\t%18s\t\t%22s\t\t%14s\r\n";
 
   private static final String DATE_FORMAT = "YYYY-MM-dd HH:mm:ss.SSS";
 
@@ -42,13 +42,13 @@ public class StatisticService {
       FileWriter statisticFile = new FileWriter(folder + fileName, true);
       statisticFile.write(String.format(STATISTIC_FORMAT,
               "clientId",
-              "commandSetType",
+              "commandSetId",
               "answerType",
               "dateSend",
-              "timeOfReceiptServer",
-              "timeOfExecSql",
-              "timeOfReceiptClient",
-              "timeOfExecuteServer"
+              "timeNetworkTrans",
+              "timeExecuteSql",
+              "timeExecuteServer",
+              "timeCommon"
               ));
       statisticFile.flush();
       statisticFile.close();
@@ -75,13 +75,13 @@ public class StatisticService {
     try {
       outList.add(String.format(STATISTIC_FORMAT,
               clientId,
-              commandSetType,
+              commandSetType + "_" + answer.getCommandSetId(),
               answer.getType(),
               simpleDateFormat.format(new Date(answer.getDateSend())),
-              answer.getTimeOfReceiptServer(),
+              answer.getTimeNetTrans(),
               answer.getTimeOfExecSql(),
-              answer.getTimeOfReceiptClient(),
-              answer.getTimeOfExecuteServer()));
+              answer.getTimeOfExecuteServer(),
+              answer.getTimeAllHandle()));
     }catch (Exception e){
       logger.log(Level.SEVERE, "Failed to write statistic");
     }

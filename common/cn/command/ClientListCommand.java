@@ -10,11 +10,7 @@ public class ClientListCommand extends Command{
   @Override
   public String toString() {
     return "<cmd>\n" +
-            "    <type>" + getType() + "</type>\n" +
-            "    <clientId>"+ getClientId() +"</clientId>\n" +
-            "    <commandId>"+ getCommandId() +"</commandId>\n" +
-            "    <commandSetId>"+ getCommandSetId() +"</commandSetId>\n" +
-            "    <dateSend>"+getDateSend()+"</dateSend>\n" +
+            super.toString() +
             "</cmd>";
   }
 

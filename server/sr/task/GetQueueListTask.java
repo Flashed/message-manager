@@ -23,22 +23,23 @@ public class GetQueueListTask implements Runnable{
 
   private QueueListCommand command;
 
+  private long startExecTime;
+
   public GetQueueListTask(QueueListCommand command ,SocketChannel clientChannel) {
+    startExecTime = System.currentTimeMillis();
     this.clientChannel = clientChannel;
     this.command = command;
   }
 
   @Override
   public void run() {
-
-    long startExecTime = System.currentTimeMillis();
     try{
       List<Queue> queues = getQueueDao().getAll();
       long endExecSqlTime = System.currentTimeMillis() - startExecTime;
       synchronized (clientChannel){
         QueueListAnswer queueListAnswer = new QueueListAnswer(queues);
         queueListAnswer.setCommandSetId(command.getCommandSetId());
-        Answer.setTimeToAnswer(command, queueListAnswer, startExecTime, endExecSqlTime);
+        Answer.setTimeServerToAnswer(command, queueListAnswer, startExecTime, endExecSqlTime);
         clientChannel.write(ByteBuffer.wrap(
                 queueListAnswer.toString()
                         .getBytes()
@@ -51,7 +52,7 @@ public class GetQueueListTask implements Runnable{
         synchronized (clientChannel) {
           ErrorAnswer answer = new ErrorAnswer("Error get list of queues");
           answer.setCommandSetId(command.getCommandSetId());
-          Answer.setTimeToAnswer(command, answer, startExecTime, 0);
+          Answer.setTimeServerToAnswer(command, answer, startExecTime, 0);
           clientChannel.write(ByteBuffer.wrap(
                   new ErrorAnswer().toString().getBytes()));
         }

@@ -25,7 +25,10 @@ public class CreateQueueTask implements Runnable{
 
   private final SocketChannel clientChannel;
 
+  private long startExecTime;
+
   public CreateQueueTask(CreateQueueCommand command, SocketChannel clientChannel) {
+    startExecTime = System.currentTimeMillis();
     this.command = command;
     this.clientChannel = clientChannel;
   }
@@ -33,7 +36,6 @@ public class CreateQueueTask implements Runnable{
   @Override
   public void run() {
 
-    long startExecTime = System.currentTimeMillis();
     try{
      Queue queue = new Queue();
       queue.setId(command.getQueueId());
@@ -49,7 +51,7 @@ public class CreateQueueTask implements Runnable{
       synchronized (clientChannel){
         SuccessAnswer answer = new SuccessAnswer("The queue created");
         answer.setCommandSetId(command.getCommandSetId());
-        Answer.setTimeToAnswer(command, answer, startExecTime, endExecSqlTime);
+        Answer.setTimeServerToAnswer(command, answer, startExecTime, endExecSqlTime);
         clientChannel.write(ByteBuffer.wrap(
                 answer.toString().getBytes()));
 
@@ -61,7 +63,7 @@ public class CreateQueueTask implements Runnable{
         synchronized (clientChannel){
           ErrorAnswer answer = new ErrorAnswer("The queue not created");
           answer.setCommandSetId(command.getCommandSetId());
-          Answer.setTimeToAnswer(command, answer, startExecTime, 0);
+          Answer.setTimeServerToAnswer(command, answer, startExecTime, 0);
           clientChannel.write(ByteBuffer.wrap(
                   answer.toString().getBytes()));
         }

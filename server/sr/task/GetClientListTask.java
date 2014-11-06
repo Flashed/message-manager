@@ -23,7 +23,10 @@ public class GetClientListTask implements Runnable{
 
   private ClientListCommand command;
 
+  private long startExecTime;
+
   public GetClientListTask(ClientListCommand command, SocketChannel clientChannel) {
+    startExecTime = System.currentTimeMillis();
     this.clientChannel = clientChannel;
     this.command = command;
   }
@@ -31,7 +34,6 @@ public class GetClientListTask implements Runnable{
   @Override
   public void run() {
 
-    long startExecTime = System.currentTimeMillis();
     try{
       List<Client> clients = getClientDao().getAll();
       long endExecSqlTime = System.currentTimeMillis() - startExecTime;
@@ -39,7 +41,7 @@ public class GetClientListTask implements Runnable{
         ClientListAnswer answer = new ClientListAnswer();
         answer.setClients(clients);
         answer.setCommandSetId(command.getCommandSetId());
-        Answer.setTimeToAnswer(command, answer, startExecTime, endExecSqlTime);
+        Answer.setTimeServerToAnswer(command, answer, startExecTime, endExecSqlTime);
         clientChannel.write(ByteBuffer.wrap(
                 answer.toString()
                         .getBytes()
@@ -52,7 +54,7 @@ public class GetClientListTask implements Runnable{
         synchronized (clientChannel) {
           ErrorAnswer answer = new ErrorAnswer("Error get list of clients");
           answer.setCommandSetId(command.getCommandSetId());
-          Answer.setTimeToAnswer(command, answer, startExecTime, 0);
+          Answer.setTimeServerToAnswer(command, answer, startExecTime, 0);
           clientChannel.write(ByteBuffer.wrap(
                   new ErrorAnswer().toString().getBytes()));
         }

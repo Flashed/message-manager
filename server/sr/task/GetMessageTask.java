@@ -26,14 +26,16 @@ public class GetMessageTask implements Runnable{
 
   private final SocketChannel clientChannel;
 
+  private long startExecTime;
+
   public GetMessageTask( GetMeMessageCommand command, SocketChannel clientChannel) {
+    startExecTime = System.currentTimeMillis();
     this.clientChannel = clientChannel;
     this.command = command;
   }
 
   @Override
   public void run() {
-    long startExecTime = System.currentTimeMillis();
     try{
       Message message;
       long endExecSqlTime;
@@ -57,7 +59,7 @@ public class GetMessageTask implements Runnable{
             answer.setText(message.getText());
             answer.setCommandSetId(command.getCommandSetId());
             answer.setMessageId(message.getId());
-            Answer.setTimeToAnswer(command, answer, startExecTime, endExecSqlTime);
+            Answer.setTimeServerToAnswer(command, answer, startExecTime, endExecSqlTime);
             clientChannel.write(ByteBuffer.wrap(
                     answer.toString().getBytes()));
             logger.info("Send " + message);
@@ -66,7 +68,7 @@ public class GetMessageTask implements Runnable{
           synchronized (clientChannel) {
             Answer answer = new SuccessAnswer("Messages not found");
             answer.setCommandSetId(command.getCommandSetId());
-            Answer.setTimeToAnswer(command, answer, startExecTime, endExecSqlTime);
+            Answer.setTimeServerToAnswer(command, answer, startExecTime, endExecSqlTime);
             clientChannel.write(ByteBuffer.wrap(
                     answer.toString().getBytes()));
         }
@@ -77,7 +79,7 @@ public class GetMessageTask implements Runnable{
         synchronized (clientChannel) {
           ErrorAnswer answer = new ErrorAnswer("Failed to get message");
           answer.setCommandSetId(command.getCommandSetId());
-          Answer.setTimeToAnswer(command, answer, startExecTime, 0);
+          Answer.setTimeServerToAnswer(command, answer, startExecTime, 0);
           clientChannel.write(ByteBuffer.wrap(
                   answer.toString().getBytes()));
         }

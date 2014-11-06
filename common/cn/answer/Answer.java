@@ -19,15 +19,13 @@ public class Answer {
 
   private long dateSend;
 
-  private long timeOfReceiptServer;
+  private long timeAllHandle;
 
-  private long timeOfReceiptClient;
+  private long timeNetTrans;
 
   private long timeOfExecSql;
 
   private long timeOfExecuteServer;
-
-  private long dateAnswer;
 
   private int commandSetId;
 
@@ -55,14 +53,6 @@ public class Answer {
     this.commandId = commandId;
   }
 
-  public long getTimeOfReceiptServer() {
-    return timeOfReceiptServer;
-  }
-
-  public void setTimeOfReceiptServer(long timeOfReceiptServer) {
-    this.timeOfReceiptServer = timeOfReceiptServer;
-  }
-
   public long getTimeOfExecSql() {
     return timeOfExecSql;
   }
@@ -79,28 +69,12 @@ public class Answer {
     this.timeOfExecuteServer = timeOfExecuteServer;
   }
 
-  public long getDateAnswer() {
-    return dateAnswer;
-  }
-
-  public void setDateAnswer(long dateAnswer) {
-    this.dateAnswer = dateAnswer;
-  }
-
   public int getCommandSetId() {
     return commandSetId;
   }
 
   public void setCommandSetId(int commandSetId) {
     this.commandSetId = commandSetId;
-  }
-
-  public long getTimeOfReceiptClient() {
-    return timeOfReceiptClient;
-  }
-
-  public void setTimeOfReceiptClient(long timeOfReceiptClient) {
-    this.timeOfReceiptClient = timeOfReceiptClient;
   }
 
   public long getDateSend() {
@@ -111,12 +85,51 @@ public class Answer {
     this.dateSend = dateSend;
   }
 
-  public static void setTimeToAnswer(Command command, Answer answer, long startExecTime, long endExecSqlTime){
+  public long getTimeAllHandle() {
+    return timeAllHandle;
+  }
+
+  public void setTimeAllHandle(long timeAllHandle) {
+    this.timeAllHandle = timeAllHandle;
+  }
+
+  public long getTimeNetTrans() {
+    return timeNetTrans;
+  }
+
+  public void setTimeNetTrans(long timeNetTrans) {
+    this.timeNetTrans = timeNetTrans;
+  }
+
+  @Override
+  public String toString() {
+    return  "    <type>"+ getType() +"</type>\n" +
+            "    <mes>"+getMessage()+"</mes>\n" +
+            "    <commandId>"+ getCommandId()+"</commandId>\n" +
+            "    <dateSend>"+getDateSend()+"</dateSend>\n" +
+            "    <timeAllHandle>"+getTimeAllHandle()+"</timeAllHandle>\n" +
+            "    <timeNetTrans>"+getTimeAllHandle()+"</timeNetTrans>\n" +
+            "    <timeOfExecSql>"+getTimeOfExecSql()+"</timeOfExecSql>\n" +
+            "    <timeOfExecuteServer>"+getTimeOfExecuteServer()+"</timeOfExecuteServer>\n" +
+            "    <commandSetId>"+getCommandSetId()+"</commandSetId>\n";
+  }
+
+  public static void setTimeServerToAnswer(Command command, Answer answer, long startExecDate, long endExecSqlTime){
     answer.setCommandId(command.getCommandId());
     answer.setDateSend(command.getDateSend());
-    answer.setTimeOfReceiptServer(command.getDateRecipient()-command.getDateSend());
     answer.setTimeOfExecSql(endExecSqlTime);
-    answer.setTimeOfExecuteServer(System.currentTimeMillis() - startExecTime);
-    answer.setDateAnswer(System.currentTimeMillis());
+    answer.setTimeOfExecuteServer(System.currentTimeMillis() - startExecDate);
   }
+
+  public static void setTimeAllAndNetTransToAnswer(Answer answer){
+    long dateSend = answer.getDateSend();
+    long allTimeHandle = System.currentTimeMillis() -dateSend;
+    long timeNetTrans = allTimeHandle - answer.getTimeOfExecuteServer();
+    answer.setTimeNetTrans(timeNetTrans);
+    answer.setTimeAllHandle(allTimeHandle);
+
+
+  }
+
+
 }

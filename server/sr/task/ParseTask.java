@@ -35,7 +35,6 @@ public class ParseTask implements Runnable {
             return;
           }
           logger.info("Parsed command " + command.getType());
-          command.setDateRecipient(System.currentTimeMillis());
           if(command instanceof CreateQueueCommand){
             getExecutor().execute(new CreateQueueTask((CreateQueueCommand) command, clientChanel));
           } else if(command instanceof  QueueListCommand){

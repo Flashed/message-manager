@@ -4,10 +4,8 @@ import cn.answer.Answer;
 import cn.answer.ErrorAnswer;
 import cn.answer.SuccessAnswer;
 import cn.command.SendMessageCommand;
-import cn.model.Client;
 import cn.model.Message;
 import sr.context.AppContext;
-import sr.dao.ClientDao;
 import sr.dao.MessageDao;
 
 import java.io.IOException;
@@ -27,14 +25,16 @@ public class SendMessageTask implements Runnable{
 
   private SendMessageCommand command;
 
+  private long startExecTime;
+
   public SendMessageTask(SendMessageCommand sendMessageCommand, SocketChannel clientChannel) {
+    startExecTime = System.currentTimeMillis();
     this.clientChannel = clientChannel;
     this.command = sendMessageCommand;
   }
 
   @Override
   public void run() {
-    long startExecTime = System.currentTimeMillis();
     try {
       MessageDao messageDao = getMessageDao();
 
@@ -56,7 +56,7 @@ public class SendMessageTask implements Runnable{
       synchronized (clientChannel) {
         SuccessAnswer answer = new SuccessAnswer("The message send");
         answer.setCommandSetId(command.getCommandSetId());
-        Answer.setTimeToAnswer(command, answer, startExecTime, endExecSqlTime);
+        Answer.setTimeServerToAnswer(command, answer, startExecTime, endExecSqlTime);
         clientChannel.write(ByteBuffer.wrap(
                 answer.toString().getBytes()));
       }
@@ -66,7 +66,7 @@ public class SendMessageTask implements Runnable{
         synchronized (clientChannel) {
           ErrorAnswer answer = new ErrorAnswer("Failed to send message");
           answer.setCommandSetId(command.getCommandSetId());
-          Answer.setTimeToAnswer(command, answer, startExecTime, 0);
+          Answer.setTimeServerToAnswer(command, answer, startExecTime, 0);
           clientChannel.write(ByteBuffer.wrap(
                   answer.toString().getBytes()));
         }

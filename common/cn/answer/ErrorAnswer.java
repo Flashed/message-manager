@@ -17,16 +17,8 @@ public class ErrorAnswer extends Answer{
   @Override
   public String toString(){
     return "<ans>\n" +
-            "    <type>"+ getType() +"</type>\n" +
-            "    <mes>"+getMessage()+"</mes>\n" +
-            "    <commandId>"+ getCommandId()+"</commandId>\n" +
-            "    <timeOfReceiptServer>"+getTimeOfReceiptServer()+"</timeOfReceiptServer>\n" +
-            "    <timeOfExecSql>"+getTimeOfExecSql()+"</timeOfExecSql>\n" +
-            "    <timeOfExecuteServer>"+getTimeOfExecuteServer()+"</timeOfExecuteServer>\n" +
-            "    <dateSend>"+getDateSend()+"</dateSend>\n" +
-            "    <dateAnswer>"+getDateAnswer()+"</dateAnswer>\n" +
-            "    <commandSetId>"+getCommandSetId()+"</commandSetId>\n" +
-            "</ans>";
+             super.toString() +
+             "</ans>";
   }
 
 }
