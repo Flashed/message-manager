@@ -25,7 +25,9 @@ import java.util.logging.Logger;
 public class Server {
 
   private static final Logger logger = Logger.getLogger(Server.class.getName());
-  
+
+  private static final int  MAX_CHAR_BUFFER_SIZE = 100*1000*1024;
+
   private boolean started;
 
   private int port;
@@ -79,12 +81,13 @@ public class Server {
           } else if (key.isReadable()) {
             read(key);
           } else{
-            logger.info("Other type key: " + key.toString());
+            logger.warning("Other type key: " + key.toString());
           }
         }
       } catch (Exception e) {
         logger.log(Level.SEVERE, "Error server work", e);
       }
+      logger.info("Application stop.");
     }
   }
 
@@ -121,7 +124,7 @@ public class Server {
       // the selection key and close the channel.
       key.cancel();
       socketChannel.close();
-      logger.log(Level.FINE, "Error read client socketChannel", e);
+      logger.log(Level.SEVERE, "Error read client socketChannel", e);
       return;
     }
 
@@ -130,7 +133,7 @@ public class Server {
       // same from our end and cancel the channel.
       key.channel().close();
       key.cancel();
-      logger.log(Level.FINE, "Client SocketChannel is closed");
+      logger.log(Level.INFO, "Client SocketChannel is closed");
       return;
     }
 
@@ -140,7 +143,9 @@ public class Server {
       writeToCharBuffer(buffer, readBuffer);
     }
     poolExecutor.execute(new ParseTask(readBuffer, socketChannel));
-    logger.fine("Size of task queue " + poolExecutor.getQueue().size());
+    if(logger.isLoggable(Level.FINE)){
+      logger.fine("Size of task queue " + poolExecutor.getQueue().size());
+    }
   }
 
   private StringBuilder getBuffer(SocketChannel clientChanel){
@@ -155,17 +160,13 @@ public class Server {
   private void writeToCharBuffer(StringBuilder buffer, ByteBuffer byteBuffer){
     byteBuffer.flip();
     byte[] bytes = byteBuffer.array();
-    int l = buffer.length();
     for(int i = byteBuffer.position(); i<byteBuffer.limit(); i++){
-      if(buffer.length() > (100*1000*1024)){
+      if(buffer.length() > MAX_CHAR_BUFFER_SIZE){
+        logger.warning("To many char buffer size.  Buffer will clear. Content: \n" + buffer.toString());
         buffer.setLength(0);
-        logger.warning("buffer.length() > " + (100*1000*1024));
         break;
       }
       buffer.append((char)bytes[i]);
-    }
-    if(logger.isLoggable(Level.FINE)){
-      logger.fine("Added to buffer " + buffer.substring(l, buffer.length()));
     }
     byteBuffer.clear();
   }

@@ -37,7 +37,7 @@ public class CreateQueueTask implements Runnable{
   public void run() {
 
     try{
-     Queue queue = new Queue();
+      Queue queue = new Queue();
       queue.setId(command.getQueueId());
 
       QueueDao dao = getQueueDao();
@@ -46,7 +46,10 @@ public class CreateQueueTask implements Runnable{
       dao.save(queue);
       long endExecSqlTime = System.currentTimeMillis() - startExecSqlTime;
 
-      logger.info("Created: "+ queue);
+      if(logger.isLoggable(Level.FINE)){
+        logger.fine("Created: "+ queue);
+      }
+
 
       synchronized (clientChannel){
         SuccessAnswer answer = new SuccessAnswer("The queue created");
@@ -57,7 +60,7 @@ public class CreateQueueTask implements Runnable{
 
       }
     } catch (Exception e){
-      logger.log(Level.SEVERE, "Error create Queue Task", e);
+      logger.log(Level.SEVERE, "Error create Queue Task." + (command != null ? " commandId: "+command.getCommandId(): ""), e);
 
       try {
         synchronized (clientChannel){
@@ -68,7 +71,7 @@ public class CreateQueueTask implements Runnable{
                   answer.toString().getBytes()));
         }
       } catch (IOException e1) {
-        logger.log(Level.SEVERE, "Error answer not sand", e1);
+        logger.log(Level.SEVERE, "Error answer not sand" + (command != null ? " commandId: "+command.getCommandId(): "") , e1);
       }
     }
   }

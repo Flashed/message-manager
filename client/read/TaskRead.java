@@ -233,7 +233,6 @@ public class TaskRead implements Runnable{
   private void writeToCharBuffer(){
     readBuffer.flip();
     byte[] bytes = readBuffer.array();
-    int l = charBuffer.length();
     for(int i = readBuffer.position(); i<readBuffer.limit(); i++){
       if(charBuffer.length() > (100*1000*1024)){
         charBuffer.setLength(0);
@@ -242,7 +241,6 @@ public class TaskRead implements Runnable{
       }
       charBuffer.append((char)bytes[i]);
     }
-    logger.info("Added to buffer " + charBuffer.substring(l));
     readBuffer.clear();
   }
 

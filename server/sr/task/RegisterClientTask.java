@@ -46,7 +46,10 @@ public class RegisterClientTask implements Runnable {
       } catch (Exception ignore){}
       long endExecSqlTime = System.currentTimeMillis() - startExecSql;
 
-      logger.info("Created: "+ client);
+      if(logger.isLoggable(Level.FINE)){
+        logger.fine("Created: "+ client);
+      }
+
 
       synchronized (clientChannel){
         SuccessAnswer answer = new SuccessAnswer("The client registered");
@@ -56,7 +59,7 @@ public class RegisterClientTask implements Runnable {
                 answer.toString().getBytes()));
       }
     } catch (Exception e){
-      logger.log(Level.SEVERE,"Failed to register client");
+      logger.log(Level.SEVERE,"Failed to register client." + (command != null ? " commandId: "+command.getCommandId(): ""), e);
       try {
         synchronized (clientChannel){
           ErrorAnswer answer = new ErrorAnswer("The client not registered");
@@ -66,7 +69,7 @@ public class RegisterClientTask implements Runnable {
                   answer.toString().getBytes()));
         }
       } catch (IOException e1) {
-        logger.log(Level.SEVERE, "Error answer not sand", e1);
+        logger.log(Level.SEVERE, "Error answer not sand." + (command != null ? " commandId: "+command.getCommandId(): ""), e1);
       }
 
     }

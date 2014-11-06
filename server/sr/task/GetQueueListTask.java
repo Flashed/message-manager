@@ -44,10 +44,12 @@ public class GetQueueListTask implements Runnable{
                 queueListAnswer.toString()
                         .getBytes()
         ));
-        logger.info("Send list of queues");
+        if(logger.isLoggable(Level.FINE)){
+          logger.fine("Send list of queues");
+        }
       }
     } catch (Exception e){
-      logger.log(Level.SEVERE, "Error get list of queues", e);
+      logger.log(Level.SEVERE, "Error get list of queues." + (command != null ? " commandId: "+command.getCommandId(): ""), e);
       try {
         synchronized (clientChannel) {
           ErrorAnswer answer = new ErrorAnswer("Error get list of queues");
@@ -57,7 +59,7 @@ public class GetQueueListTask implements Runnable{
                   new ErrorAnswer().toString().getBytes()));
         }
       } catch (IOException e1) {
-        logger.log(Level.SEVERE, "Error answer not sand", e1);
+        logger.log(Level.SEVERE, "Error answer not sand." + (command != null ? " commandId: "+command.getCommandId(): ""), e1);
       }
     }
   }

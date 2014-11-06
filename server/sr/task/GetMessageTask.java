@@ -62,7 +62,9 @@ public class GetMessageTask implements Runnable{
             Answer.setTimeServerToAnswer(command, answer, startExecTime, endExecSqlTime);
             clientChannel.write(ByteBuffer.wrap(
                     answer.toString().getBytes()));
-            logger.info("Send " + message);
+            if(logger.isLoggable(Level.FINE)){
+              logger.fine("Send " + message);
+            }
           }
         } else {
           synchronized (clientChannel) {
@@ -74,7 +76,7 @@ public class GetMessageTask implements Runnable{
         }
       }
     } catch (Exception e){
-      logger.log(Level.SEVERE, "Failed to get message", e);
+      logger.log(Level.SEVERE, "Failed to get message." + (command != null ? " commandId: "+command.getCommandId(): ""), e);
       try {
         synchronized (clientChannel) {
           ErrorAnswer answer = new ErrorAnswer("Failed to get message");
@@ -84,7 +86,7 @@ public class GetMessageTask implements Runnable{
                   answer.toString().getBytes()));
         }
       } catch (IOException e1) {
-        logger.log(Level.SEVERE, "Error answer not sand", e1);
+        logger.log(Level.SEVERE, "Error answer not sand." + (command != null ? " commandId: "+command.getCommandId(): ""), e1);
       }
     }
   }

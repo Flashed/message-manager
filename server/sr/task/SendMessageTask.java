@@ -51,7 +51,9 @@ public class SendMessageTask implements Runnable{
       }
       long endExecSqlTime = System.currentTimeMillis() - startExecSql;
 
-      logger.info("Created: " + message);
+      if(logger.isLoggable(Level.FINE)){
+        logger.fine("Created: " + message);
+      }
 
       synchronized (clientChannel) {
         SuccessAnswer answer = new SuccessAnswer("The message send");
@@ -61,7 +63,7 @@ public class SendMessageTask implements Runnable{
                 answer.toString().getBytes()));
       }
     } catch (Exception e) {
-      logger.log(Level.SEVERE, "Failed to send message", e);
+      logger.log(Level.SEVERE, "Failed to send message." + (command != null ? " commandId: "+command.getCommandId(): ""), e);
       try {
         synchronized (clientChannel) {
           ErrorAnswer answer = new ErrorAnswer("Failed to send message");
@@ -71,7 +73,7 @@ public class SendMessageTask implements Runnable{
                   answer.toString().getBytes()));
         }
       } catch (IOException e1) {
-        logger.log(Level.SEVERE, "Error answer not sand", e1);
+        logger.log(Level.SEVERE, "Error answer not sand." + (command != null ? " commandId: "+command.getCommandId(): ""), e1);
       }
 
     }

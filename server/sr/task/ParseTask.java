@@ -28,13 +28,17 @@ public class ParseTask implements Runnable {
     try {
       StringBuilder buffer = getBuffer();
       synchronized (buffer){
-        logger.fine("Current buffer state " + buffer);
         while (checkBuffer(buffer)){
           Command command = parseCommand(buffer);
           if(command == null){
+            if(logger.isLoggable(Level.INFO)){
+              logger.info("Failed a command from buffer: \n" + buffer);
+            }
             return;
           }
-          logger.info("Parsed command " + command.getType());
+          if(logger.isLoggable(Level.FINE)){
+            logger.fine("Parsed command " + command.getType());
+          }
           if(command instanceof CreateQueueCommand){
             getExecutor().execute(new CreateQueueTask((CreateQueueCommand) command, clientChanel));
           } else if(command instanceof  QueueListCommand){

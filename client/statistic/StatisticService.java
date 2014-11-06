@@ -67,7 +67,7 @@ public class StatisticService {
         }
       }).start();
     } catch (Exception e){
-      logger.log(Level.SEVERE, "Failed to open statistic file");
+      logger.log(Level.SEVERE, "Failed to open statistic file", e);
     }
   }
 
@@ -102,7 +102,7 @@ public class StatisticService {
         }
       }
     } catch (Exception e){
-      logger.log(Level.SEVERE, "Failed to write to statistic file");
+      logger.log(Level.SEVERE, "Failed to write to statistic file", e);
     }
 
   }

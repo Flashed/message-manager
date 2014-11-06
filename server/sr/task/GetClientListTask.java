@@ -46,10 +46,10 @@ public class GetClientListTask implements Runnable{
                 answer.toString()
                         .getBytes()
         ));
-        logger.info("Send list of clients");
+        logger.fine("Send list of clients");
       }
     } catch (Exception e){
-      logger.log(Level.SEVERE, "Error get list of clients", e);
+      logger.log(Level.SEVERE, "Error get list of clients." + (command != null ? " commandId: "+command.getCommandId(): ""), e);
       try {
         synchronized (clientChannel) {
           ErrorAnswer answer = new ErrorAnswer("Error get list of clients");
@@ -59,7 +59,7 @@ public class GetClientListTask implements Runnable{
                   new ErrorAnswer().toString().getBytes()));
         }
       } catch (IOException e1) {
-        logger.log(Level.SEVERE, "Error answer not sand", e1);
+        logger.log(Level.SEVERE, "Error answer not sand."+ (command != null ? " commandId: "+command.getCommandId(): ""), e1);
       }
     }
   }
