@@ -27,8 +27,8 @@ public class CreateQueueTask implements Runnable{
 
   private long startExecTime;
 
-  public CreateQueueTask(CreateQueueCommand command, SocketChannel clientChannel) {
-    startExecTime = System.currentTimeMillis();
+  public CreateQueueTask(CreateQueueCommand command, long startExecTime, SocketChannel clientChannel) {
+    this.startExecTime = startExecTime;
     this.command = command;
     this.clientChannel = clientChannel;
   }

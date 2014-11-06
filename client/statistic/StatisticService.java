@@ -73,15 +73,17 @@ public class StatisticService {
 
   public void write(String commandSetType ,Answer answer){
     try {
-      outList.add(String.format(STATISTIC_FORMAT,
-              clientId,
-              commandSetType + "_" + answer.getCommandSetId(),
-              answer.getType(),
-              simpleDateFormat.format(new Date(answer.getDateSend())),
-              answer.getTimeNetTrans(),
-              answer.getTimeOfExecSql(),
-              answer.getTimeOfExecuteServer(),
-              answer.getTimeAllHandle()));
+      synchronized (outList){
+        outList.add(String.format(STATISTIC_FORMAT,
+                clientId,
+                commandSetType + "_" + answer.getCommandSetId(),
+                answer.getType(),
+                simpleDateFormat.format(new Date(answer.getDateSend())),
+                answer.getTimeNetTrans(),
+                answer.getTimeOfExecSql(),
+                answer.getTimeOfExecuteServer(),
+                answer.getTimeAllHandle()));
+      }
     }catch (Exception e){
       logger.log(Level.SEVERE, "Failed to write statistic");
     }

@@ -27,8 +27,8 @@ public class RegisterClientTask implements Runnable {
 
   private long startExecTime;
 
-  public RegisterClientTask(RegisterClientCommand command, SocketChannel clientChannel) {
-    startExecTime = System.currentTimeMillis();
+  public RegisterClientTask(RegisterClientCommand command, long startExecTime, SocketChannel clientChannel) {
+    this.startExecTime = startExecTime;
     this.clientChannel = clientChannel;
     this.command = command;
   }

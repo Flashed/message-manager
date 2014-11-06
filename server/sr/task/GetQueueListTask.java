@@ -25,8 +25,8 @@ public class GetQueueListTask implements Runnable{
 
   private long startExecTime;
 
-  public GetQueueListTask(QueueListCommand command ,SocketChannel clientChannel) {
-    startExecTime = System.currentTimeMillis();
+  public GetQueueListTask(QueueListCommand command, long startExecTime, SocketChannel clientChannel) {
+    this.startExecTime = startExecTime;
     this.clientChannel = clientChannel;
     this.command = command;
   }

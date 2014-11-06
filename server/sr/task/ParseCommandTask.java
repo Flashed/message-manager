@@ -3,99 +3,75 @@ package sr.task;
 import cn.command.*;
 import sr.context.AppContext;
 
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-public class ParseTask implements Runnable {
+public class ParseCommandTask implements Runnable {
 
-  private static final Logger logger = Logger.getLogger(ParseTask.class.getName());
-
-  private ByteBuffer readBuffer;
+  private static final Logger logger = Logger.getLogger(ParseCommandTask.class.getName());
 
   private SocketChannel clientChanel;
 
-  public ParseTask(ByteBuffer readBuffer, SocketChannel clientChanel) {
-    this.readBuffer = readBuffer;
+  private long startExecTime;
+
+  private String commandString;
+
+  public ParseCommandTask(String command, SocketChannel clientChanel, long startExecTime) {
     this.clientChanel = clientChanel;
+    this.startExecTime = startExecTime;
+    this.commandString = command;
   }
 
   @Override
   public void run() {
     try {
-      StringBuilder buffer = getBuffer();
-      synchronized (buffer){
-        while (checkBuffer(buffer)){
-          Command command = parseCommand(buffer);
-          if(command == null){
-            if(logger.isLoggable(Level.INFO)){
-              logger.info("Failed a command from buffer: \n" + buffer);
-            }
-            return;
-          }
-          if(logger.isLoggable(Level.FINE)){
-            logger.fine("Parsed command " + command.getType());
-          }
-          if(command instanceof CreateQueueCommand){
-            getExecutor().execute(new CreateQueueTask((CreateQueueCommand) command, clientChanel));
-          } else if(command instanceof  QueueListCommand){
-            getExecutor().execute(new GetQueueListTask((QueueListCommand) command, clientChanel));
-          } else if(command instanceof ClientListCommand){
-            getExecutor().execute(new GetClientListTask((ClientListCommand) command, clientChanel));
-          } else if(command instanceof RegisterClientCommand){
-            getExecutor().execute(new RegisterClientTask((RegisterClientCommand) command, clientChanel));
-          } else if(command instanceof  SendMessageCommand){
-            getExecutor().execute(new SendMessageTask((SendMessageCommand) command, clientChanel));
-          } else if(command instanceof  GetMeMessageCommand){
-            getExecutor().execute(new GetMessageTask((GetMeMessageCommand) command, clientChanel));
-          }
-        }
+      Command command = parseCommand(commandString);
+      if(command == null){
+          logger.severe("Failed to parse command: \n" + commandString);
+        return;
+      }
+      if(logger.isLoggable(Level.FINE)){
+        logger.fine("Parsed command " + command.getType());
+      }
+      if(command instanceof CreateQueueCommand){
+        getExecutor().execute(new CreateQueueTask((CreateQueueCommand) command, startExecTime, clientChanel));
+      } else if(command instanceof  QueueListCommand){
+        getExecutor().execute(new GetQueueListTask((QueueListCommand) command, startExecTime, clientChanel));
+      } else if(command instanceof ClientListCommand){
+        getExecutor().execute(new GetClientListTask((ClientListCommand) command, startExecTime, clientChanel));
+      } else if(command instanceof RegisterClientCommand){
+        getExecutor().execute(new RegisterClientTask((RegisterClientCommand) command, startExecTime, clientChanel));
+      } else if(command instanceof  SendMessageCommand){
+        getExecutor().execute(new SendMessageTask((SendMessageCommand) command, startExecTime, clientChanel));
+      } else if(command instanceof  GetMeMessageCommand){
+        getExecutor().execute(new GetMessageTask((GetMeMessageCommand) command, startExecTime, clientChanel));
+      }
+      if(logger.isLoggable(Level.FINE)){
+        logger.fine("Size of queue of tasks: " + getExecutor().getQueue().size());
       }
     } catch (Exception e) {
-      logger.log(Level.SEVERE, "Error parse task" , e);
+      logger.log(Level.SEVERE, "Failed to parse command: \n" + commandString , e);
     }
   }
 
-  private boolean checkBuffer(StringBuilder buffer){
-    String data = buffer.toString();
-    if(data.contains("<cmd>") && data.contains("</cmd>")){
-      if(data.contains("<type>") && data.contains("</type>")){
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private Command parseCommand(StringBuilder buffer){
-    String data = buffer.toString();
-    int start = data.indexOf("<cmd>");
-    int end = data.indexOf("</cmd>");
-    String cmd = data.substring(start + 5);
-    cmd = cmd.substring(0, cmd.indexOf("</cmd>"));
+  private Command parseCommand(String cmd){
     String type = cmd.substring(cmd.indexOf("<type>") + 6);
     type = type.substring(0, type.indexOf("</type>"));
 
-    end = end + 6;
     if(Command.CREATE_QUEUE.equals(type)){
-      buffer.delete(start, end);
       return parseCreateQueueCommand(cmd);
     } else if (Command.QUEUE_LIST.equals(type)){
-      buffer.delete(start, end);
       return parseQueueListCommand(cmd);
     } else if (Command.CLIENT_LIST.equals(type)){
-      buffer.delete(start, end);
       return parseClientListCommand(cmd);
     } else if (Command.REGISTER_CLIENT.equals(type)){
-      buffer.delete(start, end);
       return parseRegisterClientCommand(cmd);
     } else if (Command.SEND_MESSAGE.equals(type)){
-      buffer.delete(start, end);
       return parseSendMessageCommand(cmd);
     }  else if (Command.GET_ME_MESSAGE.equals(type)){
-      buffer.delete(start, end);
       return parseGetMeMessageCommand(cmd);
     }
     return null;
@@ -122,7 +98,7 @@ public class ParseTask implements Runnable {
       return command;
 
     }catch (Exception e){
-      logger.log(Level.SEVERE, "Error parse GetMeMessageCommand" , e);
+      logger.log(Level.SEVERE, "Error parse GetMeMessageCommand: \n" + commandString , e);
     }
     return null;
   }
@@ -133,7 +109,7 @@ public class ParseTask implements Runnable {
       parseCommonFields(command, data);
       return command;
     } catch (Exception e){
-      logger.log(Level.SEVERE, "Error parse QueueListCommand" , e);
+      logger.log(Level.SEVERE, "Error parse QueueListCommand: \n" + commandString , e);
     }
     return null;
   }
@@ -144,7 +120,7 @@ public class ParseTask implements Runnable {
       parseCommonFields(command, data);
       return command;
     } catch (Exception e){
-      logger.log(Level.SEVERE, "Error parse ClientListCommand" , e);
+      logger.log(Level.SEVERE, "Error parse ClientListCommand: \n" + commandString , e);
     }
     return null;
   }
@@ -155,7 +131,7 @@ public class ParseTask implements Runnable {
       parseCommonFields(command, data);
       return command;
     } catch (Exception e){
-      logger.log(Level.SEVERE, "Error parse RegisterClientCommand" , e);
+      logger.log(Level.SEVERE, "Error parse RegisterClientCommand: \n" + commandString , e);
     }
     return null;
   }
@@ -175,7 +151,7 @@ public class ParseTask implements Runnable {
       return command;
 
     }catch (Exception e){
-      logger.log(Level.SEVERE, "Error parse CreateQueueCommand" , e);
+      logger.log(Level.SEVERE, "Error parse CreateQueueCommand: \n" + commandString , e);
     }
     return null;
   }
@@ -203,7 +179,7 @@ public class ParseTask implements Runnable {
       return command;
 
     }catch (Exception e){
-      logger.log(Level.SEVERE, "Error parse CreateQueueCommand" , e);
+      logger.log(Level.SEVERE, "Error parse CreateQueueCommand: \n" + commandString , e);
     }
     return null;
   }
@@ -222,15 +198,6 @@ public class ParseTask implements Runnable {
     command.setCommandId(Long.valueOf(commandId));
     command.setDateSend(Long.valueOf(dateSend));
     command.setCommandSetId(Integer.valueOf(commandSetId));
-  }
-
-  private StringBuilder getBuffer(){
-    synchronized (AppContext.getAppContext().getCommandBuffers()){
-      if(!AppContext.getAppContext().getCommandBuffers().containsKey(clientChanel)){
-        AppContext.getAppContext().getCommandBuffers().put(clientChanel, new StringBuilder());
-      }
-      return AppContext.getAppContext().getCommandBuffers().get(clientChanel);
-    }
   }
 
   private ThreadPoolExecutor getExecutor(){

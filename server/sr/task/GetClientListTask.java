@@ -25,8 +25,8 @@ public class GetClientListTask implements Runnable{
 
   private long startExecTime;
 
-  public GetClientListTask(ClientListCommand command, SocketChannel clientChannel) {
-    startExecTime = System.currentTimeMillis();
+  public GetClientListTask(ClientListCommand command, long startExecTime, SocketChannel clientChannel) {
+    this.startExecTime = startExecTime;
     this.clientChannel = clientChannel;
     this.command = command;
   }

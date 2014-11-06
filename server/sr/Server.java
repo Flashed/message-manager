@@ -1,9 +1,9 @@
 package sr;
 
 import sr.context.AppContext;
-import sr.task.ParseTask;
+import sr.task.ParseCommandTask;
+import sr.task.PrepareParseTask;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -142,7 +142,7 @@ public class Server {
     synchronized (buffer){
       writeToCharBuffer(buffer, readBuffer);
     }
-    new ParseTask(readBuffer, socketChannel).run();
+    new PrepareParseTask(socketChannel).run();
     if(logger.isLoggable(Level.FINE)){
       logger.fine("Size of task queue " + poolExecutor.getQueue().size());
     }

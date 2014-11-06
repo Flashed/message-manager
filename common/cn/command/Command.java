@@ -1,5 +1,8 @@
 package cn.command;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * The abstract sr.cn.command
  */
@@ -12,6 +15,17 @@ public abstract class Command {
   public static final String SEND_MESSAGE = "send_message";
   public static final String GET_ME_MESSAGE = "get_me_message";
 
+  private static final Set<String> typesSet = new HashSet<>();
+
+  static {
+    typesSet.add(CREATE_QUEUE);
+    typesSet.add(QUEUE_LIST);
+    typesSet.add(CLIENT_LIST);
+    typesSet.add(REGISTER_CLIENT);
+    typesSet.add(SEND_MESSAGE);
+    typesSet.add(GET_ME_MESSAGE);
+
+  }
 
   private String type;
 
@@ -61,6 +75,10 @@ public abstract class Command {
 
   public void setDateSend(long dateSend) {
     this.dateSend = dateSend;
+  }
+
+  public static Set<String> getTypesSet() {
+    return typesSet;
   }
 
   @Override

@@ -28,8 +28,8 @@ public class GetMessageTask implements Runnable{
 
   private long startExecTime;
 
-  public GetMessageTask( GetMeMessageCommand command, SocketChannel clientChannel) {
-    startExecTime = System.currentTimeMillis();
+  public GetMessageTask( GetMeMessageCommand command, long startExecTime, SocketChannel clientChannel) {
+    this.startExecTime = startExecTime;
     this.clientChannel = clientChannel;
     this.command = command;
   }

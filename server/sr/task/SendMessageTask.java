@@ -27,8 +27,8 @@ public class SendMessageTask implements Runnable{
 
   private long startExecTime;
 
-  public SendMessageTask(SendMessageCommand sendMessageCommand, SocketChannel clientChannel) {
-    startExecTime = System.currentTimeMillis();
+  public SendMessageTask(SendMessageCommand sendMessageCommand, long startExecTime, SocketChannel clientChannel) {
+    this.startExecTime = startExecTime;
     this.clientChannel = clientChannel;
     this.command = sendMessageCommand;
   }
