@@ -35,19 +35,17 @@ public class PrepareParseTask implements Runnable{
           if(cmd == null){
             logger.warning("Failed to pre-parse command. But buffer is checked." +
                       " Buffer:\n " + buffer.toString());
+            continue;
+          }
+          if(logger.isLoggable(Level.FINE)){
+            logger.fine("Pre-parsed: \n" + cmd);
+          }
+
+          getExecutor().execute(new ParseCommandTask(cmd, clientChanel, startExecTime));
+          if(logger.isLoggable(Level.FINE)){
+            logger.fine("Size of queue of tasks: " + getExecutor().getQueue().size());
           }
         }
-      }
-      if(cmd == null){
-        return;
-      }
-      if(logger.isLoggable(Level.FINE)){
-        logger.fine("Pre-parsed: \n" + cmd);
-      }
-
-      getExecutor().execute(new ParseCommandTask(cmd, clientChanel, startExecTime));
-      if(logger.isLoggable(Level.FINE)){
-        logger.fine("Size of queue of tasks: " + getExecutor().getQueue().size());
       }
 
     } catch (Exception e){

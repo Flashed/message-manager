@@ -45,10 +45,7 @@ public class SendMessageTask implements Runnable{
       message.setText(command.getText());
 
       long startExecSql = System.currentTimeMillis();
-      try {
-        messageDao.save(message);
-      } catch (Exception ignore) {
-      }
+      messageDao.save(message);
       long endExecSqlTime = System.currentTimeMillis() - startExecSql;
 
       if(logger.isLoggable(Level.FINE)){
