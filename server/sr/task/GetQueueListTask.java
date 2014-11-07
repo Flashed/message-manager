@@ -61,6 +61,9 @@ public class GetQueueListTask implements Runnable{
       } catch (IOException e1) {
         logger.log(Level.SEVERE, "Error answer not sand." + (command != null ? " commandId: "+command.getCommandId(): ""), e1);
       }
+      if(logger.isLoggable(Level.FINE)){
+        logger.fine(getClass().getName() + " finished in thread: "+ Thread.currentThread().getName());
+      }
     }
   }
 

@@ -52,6 +52,9 @@ public class PrepareParseTask implements Runnable{
       logger.log(Level.SEVERE,
               "Failed to pre-parse command. Buffer: \n" + getBuffer().toString(), e);
     }
+    if(logger.isLoggable(Level.FINE)){
+      logger.fine(getClass().getName() + " finished in thread: "+ Thread.currentThread().getName());
+    }
   }
 
   private String preParseCommand(StringBuilder buffer){

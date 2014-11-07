@@ -46,11 +46,6 @@ public class CreateQueueTask implements Runnable{
       dao.save(queue);
       long endExecSqlTime = System.currentTimeMillis() - startExecSqlTime;
 
-      if(logger.isLoggable(Level.FINE)){
-        logger.fine("Created: "+ queue);
-      }
-
-
       synchronized (clientChannel){
         SuccessAnswer answer = new SuccessAnswer("The queue created");
         answer.setCommandSetId(command.getCommandSetId());
@@ -73,6 +68,9 @@ public class CreateQueueTask implements Runnable{
       } catch (IOException e1) {
         logger.log(Level.SEVERE, "Error answer not sand" + (command != null ? " commandId: "+command.getCommandId(): "") , e1);
       }
+    }
+    if(logger.isLoggable(Level.FINE)){
+      logger.fine(getClass().getName() + " finished in thread: "+ Thread.currentThread().getName());
     }
   }
 

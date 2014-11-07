@@ -46,7 +46,6 @@ public class GetClientListTask implements Runnable{
                 answer.toString()
                         .getBytes()
         ));
-        logger.fine("Send list of clients");
       }
     } catch (Exception e){
       logger.log(Level.SEVERE, "Error get list of clients." + (command != null ? " commandId: "+command.getCommandId(): ""), e);
@@ -61,6 +60,9 @@ public class GetClientListTask implements Runnable{
       } catch (IOException e1) {
         logger.log(Level.SEVERE, "Error answer not sand."+ (command != null ? " commandId: "+command.getCommandId(): ""), e1);
       }
+    }
+    if(logger.isLoggable(Level.FINE)){
+      logger.fine(getClass().getName() + " finished in thread: "+ Thread.currentThread().getName());
     }
   }
 
