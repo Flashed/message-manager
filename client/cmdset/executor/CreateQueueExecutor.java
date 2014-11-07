@@ -27,6 +27,7 @@ public class CreateQueueExecutor implements CommandSetExecutor{
 
   private Map<Long, CommandSetExecutor> handlesTimesExecutorsMap;
 
+  private CommandSetExecutorListener listener;
 
   public CreateQueueExecutor(SocketChannel socketChannel, StatisticService statisticService) {
     this.socketChannel = socketChannel;
@@ -52,11 +53,20 @@ public class CreateQueueExecutor implements CommandSetExecutor{
   @Override
   public void handleAnswer(Answer answer) {
     statisticService.write(COMMAND_SET_TYPE, answer);
+    if(logger.isLoggable(Level.FINE)){
+      logger.fine(getClass().getName() + "finished.");
+    }
+    listener.onFinished();
   }
 
   @Override
   public void setHandlesTimesExecutorsMap(Map<Long, CommandSetExecutor> handlesTimesExecutorsMap) {
     this.handlesTimesExecutorsMap = handlesTimesExecutorsMap;
+  }
+
+  @Override
+  public void setListener(CommandSetExecutorListener listener) {
+    this.listener = listener;
   }
 
   private CreateQueueCommand createCreateQueueCommand(CommandSet commandSet){

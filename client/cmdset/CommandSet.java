@@ -29,6 +29,8 @@ public class CommandSet {
 
   private int execCount;
 
+  private int currentIteration;
+
   private int id;
 
   public CommandSet() {
@@ -57,5 +59,13 @@ public class CommandSet {
 
   public void setId(int id) {
     this.id = id;
+  }
+
+  public int getCurrentIteration() {
+    return currentIteration;
+  }
+
+  public void setCurrentIteration(int currentIteration) {
+    this.currentIteration = currentIteration;
   }
 }

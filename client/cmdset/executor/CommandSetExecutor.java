@@ -17,4 +17,6 @@ public interface CommandSetExecutor{
 
   void setHandlesTimesExecutorsMap(Map<Long,CommandSetExecutor> handlesTimesExecutorsMap);
 
+  void setListener(CommandSetExecutorListener listener);
+
 }

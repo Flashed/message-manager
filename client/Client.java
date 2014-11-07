@@ -180,8 +180,12 @@ public class Client implements CommandSetStarterListener, ReadListener {
     setExecutorsMap.put(CommandSet.TYPE_GET_AND_DELETE_MESSAGE_FROM_SENDER, getMessageExecutor4);
 
 
-    CommandSetStarter commandGenerator = new CommandSetStarter(timeoutExec, this);
-    commandGenerator.start();
+    CommandSetStarter starter = new CommandSetStarter(timeoutExec, this);
+    Collection<CommandSetExecutor> executors =  setExecutorsMap.values();
+    for(CommandSetExecutor executor: executors){
+      executor.setListener(starter);
+    }
+    starter.start();
   }
 
 
