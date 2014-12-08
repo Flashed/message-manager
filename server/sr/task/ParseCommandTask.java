@@ -55,6 +55,9 @@ public class ParseCommandTask implements Runnable {
     } catch (Exception e) {
       logger.log(Level.SEVERE, "Failed to parse command: \n" + commandString , e);
     }
+    if(logger.isLoggable(Level.FINE)){
+      logger.fine(getClass().getName() + " finished in thread: "+ Thread.currentThread().getName());
+    }
   }
 
   private Command parseCommand(String cmd){

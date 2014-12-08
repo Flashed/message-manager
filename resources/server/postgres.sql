@@ -1,4 +1,4 @@
-DROP TABLE clients;
+DROP TABLE clients CASCADE;
 CREATE TABLE clients(
   id serial,
   PRIMARY KEY (id)
@@ -7,14 +7,17 @@ CREATE TABLE clients(
 DROP TABLE messages;
 CREATE TABLE messages (
   id serial,
-  queueId int,
-  senderId int,
+  queueId int NOT NULL,
+  senderId int NOT NULL,
   receiverId int,
   mess_text text,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  FOREIGN KEY (queueId) REFERENCES queues (id) ON DELETE CASCADE,
+  FOREIGN KEY (senderId) REFERENCES clients (id),
+  FOREIGN KEY (receiverId) REFERENCES clients (id)
 );
 
-DROP TABLE queues;
+DROP TABLE queues CASCADE;
 CREATE TABLE queues(
   id serial,
   PRIMARY KEY (id)

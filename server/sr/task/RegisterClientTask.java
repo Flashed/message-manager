@@ -73,7 +73,9 @@ public class RegisterClientTask implements Runnable {
       }
 
     }
-
+    if(logger.isLoggable(Level.FINE)){
+      logger.fine(getClass().getName() + " finished in thread: "+ Thread.currentThread().getName());
+    }
   }
 
   private ClientDao getDao(){

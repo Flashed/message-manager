@@ -43,6 +43,8 @@ public class SendMessageExecutor implements CommandSetExecutor{
 
   private int clientId;
 
+  private CommandSetExecutorListener listener;
+
   List<Client> clients;
 
   public SendMessageExecutor(String commandSetType, SocketChannel socketChannel,
@@ -115,12 +117,22 @@ public class SendMessageExecutor implements CommandSetExecutor{
         handlesTimesExecutorsMap.put(command.getCommandId(), this);
       }
       sendCommand(command);
+    } else {
+      if(logger.isLoggable(Level.FINE)){
+        logger.fine(getClass().getName() + "finished.");
+      }
+      listener.onFinished();
     }
   }
 
   @Override
   public void setHandlesTimesExecutorsMap(Map<Long, CommandSetExecutor> handlesTimesExecutorsMap) {
     this.handlesTimesExecutorsMap = handlesTimesExecutorsMap;
+  }
+
+  @Override
+  public void setListener(CommandSetExecutorListener listener) {
+    this.listener = listener;
   }
 
   private void sendCommand(Command command){

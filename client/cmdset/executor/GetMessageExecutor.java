@@ -40,6 +40,8 @@ public class GetMessageExecutor implements CommandSetExecutor {
 
   private List<Client> clients;
 
+  private CommandSetExecutorListener listener;
+
   public GetMessageExecutor(SocketChannel socketChannel, StatisticService statisticService,
                             int clientId, String commandSetType) {
     this.socketChannel = socketChannel;
@@ -103,12 +105,26 @@ public class GetMessageExecutor implements CommandSetExecutor {
       } catch (IOException e) {
         logger.log(Level.SEVERE, "Error save message to folder", e);
       }
+      if(logger.isLoggable(Level.FINE)){
+        logger.fine(getClass().getName() + "finished.");
+      }
+      listener.onFinished();
+    } else {
+      if(logger.isLoggable(Level.FINE)){
+        logger.fine(getClass().getName() + "finished.");
+      }
+      listener.onFinished();
     }
   }
 
   @Override
   public void setHandlesTimesExecutorsMap(Map<Long, CommandSetExecutor> handlesTimesExecutorsMap) {
     this.handlesTimesExecutorsMap = handlesTimesExecutorsMap;
+  }
+
+  @Override
+  public void setListener(CommandSetExecutorListener listener) {
+    this.listener = listener;
   }
 
   private ClientListCommand createClientListCommand(CommandSet commandSet) {

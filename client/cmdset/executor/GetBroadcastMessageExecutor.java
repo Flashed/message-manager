@@ -35,6 +35,8 @@ public class GetBroadcastMessageExecutor implements CommandSetExecutor {
 
   private int clientId;
 
+  private CommandSetExecutorListener listener;
+
   public GetBroadcastMessageExecutor(SocketChannel socketChannel, StatisticService statisticService, int clientId,
                                      String commandSetType) {
     this.socketChannel = socketChannel;
@@ -79,15 +81,29 @@ public class GetBroadcastMessageExecutor implements CommandSetExecutor {
         writer.flush();
         writer.close();
         logger.info("Save message to file "  + "./messages/"+ ((MessageAnswer) answer).getMessageId() +".txt");
+        if(logger.isLoggable(Level.FINE)){
+          logger.fine(getClass().getName() + "finished.");
+        }
+        listener.onFinished();
       } catch (IOException e) {
         logger.log(Level.SEVERE, "Error save message to folder", e);
       }
+    }else{
+      if(logger.isLoggable(Level.FINE)){
+        logger.fine(getClass().getName() + "finished.");
+      }
+      listener.onFinished();
     }
   }
 
   @Override
   public void setHandlesTimesExecutorsMap(Map<Long, CommandSetExecutor> handlesTimesExecutorsMap) {
     this.handlesTimesExecutorsMap = handlesTimesExecutorsMap;
+  }
+
+  @Override
+  public void setListener(CommandSetExecutorListener listener) {
+    this.listener = listener;
   }
 
   private QueueListCommand createQueueListCommand(CommandSet commandSet){

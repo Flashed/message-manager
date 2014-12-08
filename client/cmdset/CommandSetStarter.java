@@ -1,9 +1,12 @@
 package cmdset;
 
+import cmdset.executor.CommandSetExecutorListener;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,7 +14,7 @@ import java.util.logging.Logger;
 /**
  * Read ant start command set
  */
-public class CommandSetStarter {
+public class CommandSetStarter implements CommandSetExecutorListener{
 
   private static final Logger logger = Logger.getLogger(CommandSetStarter.class.getName());
 
@@ -19,9 +22,14 @@ public class CommandSetStarter {
 
   private List<CommandSet> cmdExecList = new ArrayList<>();
 
+  private Iterator<CommandSet> iterator;
+
   private long timeoutExec;
 
   private volatile boolean started;
+
+  private CommandSet current;
+
 
   public CommandSetStarter(long timeoutExec, CommandSetStarterListener listener) {
     if(timeoutExec <= 0){
@@ -73,27 +81,56 @@ public class CommandSetStarter {
     if(started){
       return;
     }
+    
     started = true;
-      for(CommandSet cmdExec: cmdExecList){
-        for(int i=0; i<cmdExec.getExecCount(); i++){
-          if(!started){
-            return;
-          }
-          if(listener != null){
-            cmdExec.setId(i);
-            listener.onGetCommandSet(cmdExec);
-            logger.info(String.format("Execute  %s iteration %s", cmdExec.getType(), i+1));
-            try {
-              Thread.sleep(timeoutExec);
-            } catch (InterruptedException ignore) {
-            }
-          }
-        }
-      }
+    
+    if(cmdExecList == null || cmdExecList.isEmpty()){
+      logger.severe("Failed to start command set. List commandSets is null or empty!");
+      return;
+    }
+    iterator = cmdExecList.iterator();
+
+    current = iterator.next();
+    current.setCurrentIteration(1);
+    current.setId(0);
+    runCommandSetIteration();
+    
   }
 
   public void stop(){
     started = false;
   }
 
+  @Override
+  public void onFinished() {   
+    if(!started){
+      return;
+    }
+    
+    if(current.getExecCount() > current.getCurrentIteration()){
+      current.setCurrentIteration(current.getCurrentIteration() + 1);
+      current.setId(current.getId() + 1);
+      runCommandSetIteration();
+    }else{
+      if(!iterator.hasNext()){
+        return;
+      }
+      current = iterator.next();
+      current.setCurrentIteration(current.getCurrentIteration() + 1);
+      current.setId(current.getId() + 1);
+      runCommandSetIteration();
+    }
+  }
+
+  private void runCommandSetIteration() {
+
+    if (listener != null) {
+      logger.info(String.format("Execute  %s iteration %s", current.getType(), current.getCurrentIteration()));
+      try {
+        Thread.sleep(timeoutExec);
+      } catch (InterruptedException ignore) {
+      }
+      listener.onGetCommandSet(current);
+    }
+  }
 }

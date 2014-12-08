@@ -29,6 +29,8 @@ public class RegisterClientExecutor implements CommandSetExecutor{
 
   private Map<Long, CommandSetExecutor> handlesTimesExecutorsMap;
 
+  private CommandSetExecutorListener listener;
+
   public RegisterClientExecutor(SocketChannel socketChannel, StatisticService statisticService, int clientId) {
     this.socketChannel = socketChannel;
     this.statisticService = statisticService;
@@ -55,11 +57,20 @@ public class RegisterClientExecutor implements CommandSetExecutor{
   @Override
   public void handleAnswer(Answer answer) {
     statisticService.write(COMMAND_SET_TYPE, answer);
+    if(logger.isLoggable(Level.FINE)){
+      logger.fine(getClass().getName() + "finished.");
+    }
+    listener.onFinished();
   }
 
   @Override
   public void setHandlesTimesExecutorsMap(Map<Long, CommandSetExecutor> handlesTimesExecutorsMap) {
     this.handlesTimesExecutorsMap = handlesTimesExecutorsMap;
+  }
+
+  @Override
+  public void setListener(CommandSetExecutorListener listener) {
+    this.listener = listener;
   }
 
   private RegisterClientCommand createRegisterClientCommand(CommandSet commandSet){
