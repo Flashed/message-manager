@@ -21,6 +21,8 @@ public class CommandSetStarter {
 
   private long timeoutExec;
 
+  private volatile boolean started;
+
   public CommandSetStarter(long timeoutExec, CommandSetStarterListener listener) {
     if(timeoutExec <= 0){
       this.timeoutExec = 10;
@@ -68,8 +70,15 @@ public class CommandSetStarter {
 
   public void start(){
 
+    if(started){
+      return;
+    }
+    started = true;
       for(CommandSet cmdExec: cmdExecList){
         for(int i=0; i<cmdExec.getExecCount(); i++){
+          if(!started){
+            return;
+          }
           if(listener != null){
             cmdExec.setId(i);
             listener.onGetCommandSet(cmdExec);
@@ -81,8 +90,10 @@ public class CommandSetStarter {
           }
         }
       }
+  }
 
-
+  public void stop(){
+    started = false;
   }
 
 }

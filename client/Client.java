@@ -45,6 +45,8 @@ public class Client implements CommandSetStarterListener, ReadListener {
 
   private String statisticFolder;
 
+  private CommandSetStarter commandGenerator;
+
   public Client(String host, int port, long timeoutExec, int clientId, String statisticFolder) {
     this.host = host;
     this.port = port;
@@ -180,7 +182,7 @@ public class Client implements CommandSetStarterListener, ReadListener {
     setExecutorsMap.put(CommandSet.TYPE_GET_AND_DELETE_MESSAGE_FROM_SENDER, getMessageExecutor4);
 
 
-    CommandSetStarter commandGenerator = new CommandSetStarter(timeoutExec, this);
+    commandGenerator = new CommandSetStarter(timeoutExec, this);
     commandGenerator.start();
   }
 
@@ -205,6 +207,16 @@ public class Client implements CommandSetStarterListener, ReadListener {
       if(handlesTimesExecutorsMap.containsKey(answer.getCommandId())){
         handlesTimesExecutorsMap.remove(answer.getCommandId()).handleAnswer(answer);
       }
+    }
+  }
+
+  @Override
+  public void onStop() {
+    if(statisticService != null){
+      statisticService.stop();
+    }
+    if(commandGenerator != null){
+      commandGenerator.stop();
     }
   }
 

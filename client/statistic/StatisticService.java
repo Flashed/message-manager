@@ -32,6 +32,8 @@ public class StatisticService {
 
   private int clientId;
 
+  private volatile boolean started = false;
+
   public StatisticService() {
 
   }
@@ -53,10 +55,12 @@ public class StatisticService {
       statisticFile.flush();
       statisticFile.close();
 
+      started = true;
+
       new Thread(new Runnable() {
         @Override
         public void run() {
-          while (true){
+          while (started){
             try {
               Thread.sleep(10000);
             } catch (InterruptedException e) {
@@ -107,6 +111,10 @@ public class StatisticService {
       logger.log(Level.SEVERE, "Failed to write to statistic file", e);
     }
 
+  }
+
+  public void stop(){
+    started = false;
   }
 
   public void setClientId(int clientId) {

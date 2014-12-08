@@ -55,6 +55,10 @@ public class TaskRead implements Runnable{
         }
       }
       socketChannel.close();
+      logger.log(Level.INFO, "Reading was stop" );
+      if(readListener != null){
+        readListener.onStop();
+      }
     } catch (Exception e){
       logger.log(Level.SEVERE, "Reading was stop" , e);
     }
