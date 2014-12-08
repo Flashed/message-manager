@@ -204,6 +204,11 @@ public class Client implements CommandSetStarterListener, ReadListener {
   }
 
   @Override
+  public void onStopCommandSetStarter() {
+    taskRead.closeReader();
+  }
+
+  @Override
   public void onReadAnswer(Answer answer) {
     synchronized (handlesTimesExecutorsMap){
       Collection<Long> keys = handlesTimesExecutorsMap.keySet();
@@ -215,7 +220,7 @@ public class Client implements CommandSetStarterListener, ReadListener {
   }
 
   @Override
-  public void onStop() {
+  public void onStopRead() {
     if(statisticService != null){
       statisticService.stop();
     }

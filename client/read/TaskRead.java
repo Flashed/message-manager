@@ -4,6 +4,7 @@ import cn.answer.*;
 import cn.model.Client;
 import cn.model.Queue;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
@@ -25,8 +26,28 @@ public class TaskRead implements Runnable{
 
   private StringBuilder charBuffer = new StringBuilder();
 
+  private boolean stopCommanded;
+
   public TaskRead(SocketChannel socketChannel) {
     this.socketChannel = socketChannel;
+  }
+
+  public void closeReader(){
+
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException ignore) {}
+
+    synchronized (socketChannel){
+      if(socketChannel != null && socketChannel.isOpen()){
+        try {
+          stopCommanded = true;
+          socketChannel.close();
+        } catch (IOException e) {
+          logger.log(Level.SEVERE, "Error close reader", e);
+        }
+      }
+    }
   }
 
   @Override
@@ -56,11 +77,15 @@ public class TaskRead implements Runnable{
       }
       socketChannel.close();
       logger.log(Level.INFO, "Reading was stop" );
-      if(readListener != null){
-        readListener.onStop();
-      }
     } catch (Exception e){
-      logger.log(Level.SEVERE, "Reading was stop" , e);
+      if(!stopCommanded){
+        logger.log(Level.SEVERE, "Reading was stop" , e);
+      } else {
+        logger.log(Level.INFO, "Reading was stop" );
+      }
+    }
+    if(readListener != null){
+      readListener.onStopRead();
     }
   }
 

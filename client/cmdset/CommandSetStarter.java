@@ -113,6 +113,9 @@ public class CommandSetStarter implements CommandSetExecutorListener{
       runCommandSetIteration();
     }else{
       if(!iterator.hasNext()){
+        if(listener != null){
+          listener.onStopCommandSetStarter();
+        }
         return;
       }
       current = iterator.next();

@@ -8,5 +8,5 @@ public interface ReadListener {
 
   void onReadAnswer(Answer answer);
 
-  void onStop();
+  void onStopRead();
 }
